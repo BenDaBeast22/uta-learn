@@ -1,0 +1,32 @@
+{
+  "name": "uta-learn",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "fetch-lyrics": "node scripts/fetch-lyrics.mjs",
+    "tokenize-lyrics": "node scripts/tokenize-lyrics.mjs"
+  },
+  "dependencies": {
+    "kuromoji": "0.1.2",
+    "liricle": "4.2.0",
+    "next": "14.2.35",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "wanakana": "5.3.1"
+  },
+  "devDependencies": {
+    "kuromoji": "0.1.2",
+    "wanakana": "5.3.1",
+    "typescript": "^5.5.4",
+    "@types/node": "^20.14.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "tailwindcss": "^3.4.7",
+    "postcss": "^8.4.40",
+    "autoprefixer": "^10.4.19"
+  }
+}

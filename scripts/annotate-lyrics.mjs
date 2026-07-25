@@ -1,0 +1,185 @@
+#!/usr/bin/env node
+/**
+ * Takes the skeleton written by fetch-lyrics.mjs (data/imports/<id>.json —
+ * lines with start/end/text) and produces a fully annotated lyrics file:
+ *   1. Tokenizes each line's text with kuromoji (a real Japanese
+ *      morphological analyzer — proper word/particle segmentation, not a
+ *      naive character split).
+ *   2. Converts each token's reading to romaji with wanakana, with a few
+ *      manual corrections for particles that are written one way and read
+ *      another (は as "wa", へ as "e", を as "o").
+ *   3. Looks up an English gloss for each token from Jisho's public API
+ *      (a JMdict-based dictionary — general vocabulary, not lyrics).
+ *   4. Writes data/imports/<id>.lyrics.ts, exporting a `<id>Lyrics` array
+ *      shaped exactly like `LyricLine[]` from lib/types.ts.
+ *
+ * This is a rough first pass, not a finished translation — kuromoji doesn't
+ * understand context, so it can mis-segment ambiguous phrases, and Jisho
+ * lookups use each word's dictionary (base) form, so idioms, wordplay, and
+ * slang often need a manual fix. Read through the output before using it.
+ *
+ * Usage:
+ *   node scripts/annotate-lyrics.mjs <id>
+ *
+ * Example:
+ *   node scripts/annotate-lyrics.mjs mirage
+ *   (expects data/imports/mirage.json to already exist — see fetch-lyrics.mjs)
+ */
+
+import { readFile, writeFile } from "node:fs/promises";
+import path from "node:path";
+import kuromoji from "kuromoji";
+import * as wanakana from "wanakana";
+
+const [, , id] = process.argv;
+
+if (!id) {
+  console.error("Usage: node scripts/annotate-lyrics.mjs <id>");
+  process.exit(1);
+}
+
+// Particles whose kana reading doesn't match how they're actually
+// pronounced in this grammatical role. Kuromoji tags these as "助詞"
+// (particle), so we only apply the override for that part of speech.
+const PARTICLE_ROMAJI_OVERRIDES = {
+  は: "wa",
+  へ: "e",
+  を: "o",
+};
+
+const POS_MAP = {
+  名詞: "noun",
+  動詞: "verb",
+  助詞: "particle",
+  助動詞: "auxiliary verb",
+  形容詞: "adjective",
+  形容動詞: "na-adjective",
+  副詞: "adverb",
+  連体詞: "adnominal",
+  接続詞: "conjunction",
+  感動詞: "interjection",
+  記号: "symbol",
+  フィラー: "filler",
+};
+
+const meaningCache = new Map();
+
+async function lookupMeaning(word) {
+  if (meaningCache.has(word)) return meaningCache.get(word);
+
+  let meaning = "";
+  try {
+    const res = await fetch(
+      `https://jisho.org/api/v1/search/words?keyword=${encodeURIComponent(word)}`,
+      { signal: AbortSignal.timeout(5000) }
+    );
+    if (res.ok) {
+      const data = await res.json();
+      const senses = data?.data?.[0]?.senses;
+      const definitions = senses?.[0]?.english_definitions;
+      if (definitions?.length) meaning = definitions.slice(0, 3).join("; ");
+    }
+  } catch (err) {
+    console.warn(`  ! lookup failed for "${word}": ${err.message}`);
+  }
+
+  meaningCache.set(word, meaning);
+  return meaning;
+}
+
+function buildTokenizer() {
+  const dicPath = path.join(process.cwd(), "node_modules/kuromoji/dict");
+  return new Promise((resolve, reject) => {
+    kuromoji.builder({ dicPath }).build((err, tokenizer) => {
+      if (err) reject(err);
+      else resolve(tokenizer);
+    });
+  });
+}
+
+function sleep(ms) {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
+async function main() {
+  const importPath = path.join(process.cwd(), "data", "imports", `${id}.json`);
+  const raw = await readFile(importPath, "utf-8").catch(() => {
+    console.error(
+      `Couldn't read ${importPath}. Run \`npm run fetch-lyrics -- "<track>" "<artist>" ${id}\` first.`
+    );
+    process.exit(1);
+  });
+  const skeleton = JSON.parse(raw);
+
+  console.log("Loading tokenizer (kuromoji)...");
+  const tokenizer = await buildTokenizer();
+
+  const annotatedLines = [];
+
+  for (const [i, line] of skeleton.lines.entries()) {
+    console.log(`Tokenizing line ${i + 1}/${skeleton.lines.length}: ${line.text}`);
+    const morphemes = tokenizer.tokenize(line.text);
+    const tokens = [];
+
+    for (const m of morphemes) {
+      const posTop = m.pos; // e.g. "記号", "名詞", "助詞"...
+      const isSymbol = posTop === "記号";
+
+      if (isSymbol) {
+        tokens.push({ surface: m.surface_form, romaji: "", meaning: "", skip: true });
+        continue;
+      }
+
+      let romaji = m.reading ? wanakana.toRomaji(m.reading) : wanakana.toRomaji(m.surface_form);
+      if (posTop === "助詞" && PARTICLE_ROMAJI_OVERRIDES[m.surface_form]) {
+        romaji = PARTICLE_ROMAJI_OVERRIDES[m.surface_form];
+      }
+
+      const meaning = await lookupMeaning(m.basic_form || m.surface_form);
+      await sleep(250); // be polite to Jisho's free API
+
+      tokens.push({
+        surface: m.surface_form,
+        romaji,
+        meaning: meaning || "(no dictionary match — fill in manually)",
+        pos: POS_MAP[posTop] || posTop,
+      });
+    }
+
+    annotatedLines.push({
+      id: line.id,
+      start: line.start,
+      end: line.end,
+      tokens,
+    });
+  }
+
+  const varName = `${toCamelCase(id)}Lyrics`;
+  const fileContents = `// Auto-generated by scripts/annotate-lyrics.mjs — review before use.
+// Meanings are rough dictionary-form glosses from Jisho, not verified
+// translations. Kuromoji can mis-segment ambiguous phrases. Read through
+// this and fix anything that's wrong before wiring it into data/tracks.ts.
+import { LyricLine } from "@/lib/types";
+
+export const ${varName}: LyricLine[] = ${JSON.stringify(annotatedLines, null, 2)};
+`;
+
+  const outPath = path.join(process.cwd(), "data", "imports", `${id}.lyrics.ts`);
+  await writeFile(outPath, fileContents, "utf-8");
+
+  console.log(`\nWrote data/imports/${id}.lyrics.ts (exports \`${varName}\`).`);
+  console.log(
+    "Next: review it, then in data/tracks.ts —\n" +
+      `  import { ${varName} } from "./imports/${id}.lyrics";\n` +
+      `  ...and set that track's \`lyrics: ${varName}\`.`
+  );
+}
+
+function toCamelCase(str) {
+  return str.replace(/-([a-z0-9])/g, (_, c) => c.toUpperCase());
+}
+
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
