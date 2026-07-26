@@ -8,15 +8,14 @@
     "start": "next start",
     "lint": "next lint",
     "fetch-lyrics": "node scripts/fetch-lyrics.mjs",
-    "tokenize-lyrics": "node scripts/tokenize-lyrics.mjs"
+    "tokenize-lyrics": "node scripts/tokenize-lyrics.mjs",
+    "import-lyrics": "node scripts/import-lyrics.mjs"
   },
   "dependencies": {
-    "kuromoji": "0.1.2",
     "liricle": "4.2.0",
     "next": "14.2.35",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "wanakana": "5.3.1"
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "kuromoji": "0.1.2",

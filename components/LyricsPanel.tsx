@@ -9,9 +9,10 @@ interface LyricsPanelProps {
   lyrics: LyricLine[];
   currentTime: number;
   accent: string;
+  onLineClick?: (start: number) => void;
 }
 
-export default function LyricsPanel({ lyrics, currentTime, accent }: LyricsPanelProps) {
+export default function LyricsPanel({ lyrics, currentTime, accent, onLineClick }: LyricsPanelProps) {
   const { lineIndex: activeIndex, wordIndex: activeWordIndex } = useLyricSync(lyrics, currentTime);
 
   const lineRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -33,8 +34,8 @@ export default function LyricsPanel({ lyrics, currentTime, accent }: LyricsPanel
         const progress = isActive
           ? Math.min(1, Math.max(0, (currentTime - line.start) / (line.end - line.start)))
           : isPast
-          ? 1
-          : 0;
+            ? 1
+            : 0;
 
         return (
           <div
@@ -42,9 +43,19 @@ export default function LyricsPanel({ lyrics, currentTime, accent }: LyricsPanel
             ref={(el) => {
               lineRefs.current[i] = el;
             }}
+            role={onLineClick ? "button" : undefined}
+            tabIndex={onLineClick ? 0 : undefined}
+            onClick={() => onLineClick?.(line.start)}
+            onKeyDown={(e) => {
+              if (!onLineClick) return;
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onLineClick(line.start);
+              }
+            }}
             className={`relative rounded-xl px-3 py-2.5 transition-all duration-200 ${
-              isActive ? "bg-ink-line/70" : "opacity-50 hover:opacity-80"
-            }`}
+              onLineClick ? "cursor-pointer" : ""
+            } ${isActive ? "bg-ink-line/70" : "opacity-50 hover:opacity-80"}`}
           >
             {isActive && (
               <span

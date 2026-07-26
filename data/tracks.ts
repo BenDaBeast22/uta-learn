@@ -1,5 +1,6 @@
 import { Track } from "@/lib/types";
-import { generatedLyrics } from "./imports/mirage.lyrics.generated";
+import { mirageLyrics } from "./imports/mirage.lyrics.generated";
+import { maMeuilleureEnnemieLyrics } from "./imports/ma-meilleure-ennemie.lyrics.generated";
 
 /**
  * NOTE ON CONTENT:
@@ -39,65 +40,19 @@ export const tracks: Track[] = [
     summary: "Add your own one-line summary here.",
     // I can't fill the lyrics in for you — see the note below the array.
     // Copy the shape of this line once per lyric line in the song:
-    lyrics: generatedLyrics,
+    lyrics: mirageLyrics,
   },
   {
-    id: "natsu-no-kaze",
-    title: "夏の風",
-    titleRomaji: "Natsu no Kaze",
-    artist: "Uta Learn Demo",
+    id: "ma-meilleure-ennemie",
+    title: "Ma Meilleure Ennemie",
+    titleRomaji: "Ma Meuilleueure Ennemie",
+    artist: "Stromae",
     level: "Beginner",
-    duration: "0:24",
-    youtubeId: "REPLACE_WITH_YOUTUBE_ID_1",
+    duration: "2:48",
+    youtubeId: "34O4TxvuEKE",
     accent: "#6F9E8C",
     summary: "A gentle walk under a summer sky — short lines, everyday words.",
-    lyrics: [
-      {
-        id: "l1",
-        start: 2,
-        end: 6,
-        tokens: [
-          { surface: "夏", romaji: "natsu", meaning: "summer", pos: "noun" },
-          { surface: "の", romaji: "no", meaning: "'s / of", pos: "particle" },
-          { surface: "風", romaji: "kaze", meaning: "wind", pos: "noun" },
-          { surface: "が", romaji: "ga", meaning: "(marks the subject)", pos: "particle" },
-          { surface: "吹く", romaji: "fuku", meaning: "to blow", pos: "verb" },
-        ],
-      },
-      {
-        id: "l2",
-        start: 6,
-        end: 10,
-        tokens: [
-          { surface: "空", romaji: "sora", meaning: "sky", pos: "noun" },
-          { surface: "は", romaji: "wa", meaning: "(marks the topic)", pos: "particle" },
-          { surface: "とても", romaji: "totemo", meaning: "very", pos: "adverb" },
-          { surface: "青い", romaji: "aoi", meaning: "blue", pos: "adjective" },
-        ],
-      },
-      {
-        id: "l3",
-        start: 10,
-        end: 14,
-        tokens: [
-          { surface: "君", romaji: "kimi", meaning: "you", pos: "pronoun" },
-          { surface: "と", romaji: "to", meaning: "with", pos: "particle" },
-          { surface: "歩く", romaji: "aruku", meaning: "to walk", pos: "verb" },
-          { surface: "道", romaji: "michi", meaning: "road, path", pos: "noun" },
-        ],
-      },
-      {
-        id: "l4",
-        start: 14,
-        end: 18,
-        tokens: [
-          { surface: "笑顔", romaji: "egao", meaning: "smiling face", pos: "noun" },
-          { surface: "が", romaji: "ga", meaning: "(marks the subject)", pos: "particle" },
-          { surface: "まぶしい", romaji: "mabushii", meaning: "dazzling, radiant", pos: "adjective" },
-          { surface: "ね", romaji: "ne", meaning: "right?, isn't it", pos: "particle" },
-        ],
-      },
-    ],
+    lyrics: maMeuilleureEnnemieLyrics,
   },
   {
     id: "tsuki-akari",
