@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { tracks } from "@/data/tracks";
 import TrackCard from "@/components/TrackCard";
-import UserMenu from "@/components/UserMenu";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function TracksPage() {
@@ -12,35 +11,25 @@ export default async function TracksPage() {
 
   return (
     <main className="mx-auto max-w-5xl px-6 py-12 sm:py-16">
-      {/* Top Header Row */}
-      <div className="flex items-center justify-between border-b border-paper/10 pb-6 mb-12">
-        <p className="font-mono text-xs uppercase tracking-[0.3em] text-gold">歌 — Uta Learn</p>
-
-        {/* Dynamic Auth Action */}
-        {user ? (
-          <UserMenu email={user.email ?? ""} />
-        ) : (
-          <Link
-            href="/login"
-            className="rounded-full border border-paper/20 px-5 py-2 font-mono text-xs text-paper transition hover:border-gold hover:text-gold"
-          >
-            Sign In
-          </Link>
-        )}
-      </div>
-
       <header className="seam mb-12 pl-5">
-        <h1 className="font-display text-4xl leading-tight text-paper sm:text-5xl">
+        <div className="flex items-center gap-2">
+          <span className="rounded bg-gold/10 px-2 py-0.5 font-mono text-[10px] uppercase text-gold border border-gold/20">
+            Curated Path
+          </span>
+        </div>
+
+        <h1 className="mt-3 font-display text-4xl leading-tight text-paper sm:text-5xl">
           Learn Japanese,
           <br />
           one song at a time.
         </h1>
+
         <p className="mt-4 max-w-xl text-sm leading-relaxed text-paper/60 sm:text-base">
-          Pick a track. Follow the lyrics as they line up with the music, and hover any word to see how it&apos;s read
-          and what it means.
+          Pick a track from our curated curriculum. Tracks are ordered by difficulty with hand-crafted translations and
+          readings.
         </p>
 
-        {/* Feature Teaser for Guests ONLY */}
+        {/* Guest Teaser Banner */}
         {!user && (
           <div className="mt-6 flex flex-wrap items-center gap-2 rounded-lg border border-paper/10 bg-paper/5 px-4 py-3 text-xs text-paper/70 sm:text-sm">
             <span className="font-semibold text-gold">Want more?</span>
@@ -55,6 +44,7 @@ export default async function TracksPage() {
         )}
       </header>
 
+      {/* Track Grid */}
       <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {tracks.map((track, i) => (
           <TrackCard key={track.id} track={track} index={i} />

@@ -1,3 +1,5 @@
+import Navbar from "@/components/Navbar";
+import { createClient } from "@/lib/supabase/server";
 import type { Metadata } from "next";
 import "./globals.css";
 
@@ -7,14 +9,18 @@ export const metadata: Metadata = {
     "Learn Japanese through songs. Follow synced lyrics as you listen, and hover any word for its romaji and meaning.",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   return (
     <html lang="en">
-      <body className="font-body min-h-screen">{children}</body>
+      <body className=" text-paper antialiased">
+        <Navbar userEmail={user?.email ?? null} />
+        {children}
+      </body>
     </html>
   );
 }
