@@ -2,19 +2,25 @@
 
 import { useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { WordToken as WordTokenData } from "@/lib/types";
+import { WordToken as WordTokenData, LyricDisplayMode } from "@/lib/types";
 
 const POPOVER_WIDTH = 208; // px — matches max-w-[13rem] below
 const POPOVER_EST_HEIGHT = 132; // px — rough estimate, used to decide whether to flip below
 const VIEWPORT_MARGIN = 8;
 
-export default function WordToken({ token, active = false }: { token: WordTokenData; active?: boolean }) {
+interface WordTokenProps {
+  token: WordTokenData;
+  active?: boolean;
+  displayMode?: LyricDisplayMode;
+}
+
+export default function WordToken({ token, active = false, displayMode = "kanji" }: WordTokenProps) {
   const [open, setOpen] = useState(false);
   const [coords, setCoords] = useState<{ left: number; top: number; flip: boolean } | null>(null);
   const triggerRef = useRef<HTMLSpanElement>(null);
 
   if (token.skip) {
-    return <span>{token.surface}</span>;
+    return <span>{displayMode === "romaji" ? token.romaji || token.surface : token.surface}</span>;
   }
 
   function updatePosition() {
@@ -48,10 +54,31 @@ export default function WordToken({ token, active = false }: { token: WordTokenD
     setOpen(false);
   }
 
+  // Determine what text to show in the inline token based on mode
+  const renderInlineContent = () => {
+    if (displayMode === "romaji") {
+      return <span className="font-mono text-sm sm:text-base">{token.romaji}</span>;
+    }
+
+    if (displayMode === "dual") {
+      return (
+        <ruby className="inline-flex flex-col-reverse items-center align-bottom">
+          <span>{token.surface}</span>
+          <rt className="font-mono text-[0.65rem] tracking-normal opacity-80 group-hover:text-ink group-focus:text-ink">
+            {token.romaji}
+          </rt>
+        </ruby>
+      );
+    }
+
+    // Default 'kanji' mode
+    return token.surface;
+  };
+
   return (
     <span
       ref={triggerRef}
-      className="group relative inline-block cursor-help"
+      className="group relative inline-block cursor-help mx-0.5"
       onMouseEnter={show}
       onMouseLeave={hide}
       onFocus={show}
@@ -63,7 +90,7 @@ export default function WordToken({ token, active = false }: { token: WordTokenD
           active ? "bg-seal text-paper" : ""
         }`}
       >
-        {token.surface}
+        {renderInlineContent()}
       </span>
 
       {open &&
@@ -81,13 +108,24 @@ export default function WordToken({ token, active = false }: { token: WordTokenD
             <span className="relative block rounded-lg border border-gold/40 bg-paper px-3 py-2 text-left shadow-tag">
               {/* punch hole, nafuda tag style */}
               <span className="absolute -top-1.5 left-1/2 h-3 w-3 -translate-x-1/2 rounded-full border border-gold/50 bg-ink" />
-              <span className="block font-mono text-[0.7rem] uppercase tracking-wide text-seal">{token.romaji}</span>
+
+              {/* Header text in popover switches based on displayMode */}
+              {displayMode === "romaji" ? (
+                <span className="block font-display text-base font-semibold leading-tight text-seal">
+                  {token.surface}
+                </span>
+              ) : (
+                <span className="block font-mono text-[0.7rem] uppercase tracking-wide text-seal">{token.romaji}</span>
+              )}
+
               <span className="mt-0.5 block font-body text-sm leading-snug text-ink">{token.meaning}</span>
+
               {token.pos && (
                 <span className="mt-1 block font-mono text-[0.6rem] uppercase tracking-wider text-ink/50">
                   {token.pos}
                 </span>
               )}
+
               {/* little tail/string, pointing toward whichever side the word is on */}
               {coords.flip ? (
                 <span className="absolute bottom-full left-1/2 h-2 w-px -translate-x-1/2 bg-gold/50" />

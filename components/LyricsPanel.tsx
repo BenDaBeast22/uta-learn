@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { LyricLine } from "@/lib/types";
+import { LyricLine, LyricDisplayMode } from "@/lib/types";
 import { useLyricSync } from "@/lib/useLyricSync";
 import WordToken from "./WordToken";
 
@@ -9,10 +9,17 @@ interface LyricsPanelProps {
   lyrics: LyricLine[];
   currentTime: number;
   accent: string;
+  displayMode?: LyricDisplayMode;
   onLineClick?: (start: number) => void;
 }
 
-export default function LyricsPanel({ lyrics, currentTime, accent, onLineClick }: LyricsPanelProps) {
+export default function LyricsPanel({
+  lyrics,
+  currentTime,
+  accent,
+  displayMode = "kanji",
+  onLineClick,
+}: LyricsPanelProps) {
   const { lineIndex: activeIndex, wordIndex: activeWordIndex } = useLyricSync(lyrics, currentTime);
 
   const lineRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -55,7 +62,7 @@ export default function LyricsPanel({ lyrics, currentTime, accent, onLineClick }
             }}
             className={`relative rounded-xl px-3 py-2.5 transition-all duration-200 ${
               onLineClick ? "cursor-pointer" : ""
-            } ${isActive ? "bg-ink-line/70" : "opacity-50 hover:opacity-80"}`}
+            } ${isActive ? "bg-ink-line/70 opacity-100" : "opacity-50 hover:opacity-80"}`}
           >
             {isActive && (
               <span
@@ -64,9 +71,18 @@ export default function LyricsPanel({ lyrics, currentTime, accent, onLineClick }
               />
             )}
             <div className="relative pl-3">
-              <div className="font-display text-lg leading-relaxed tracking-wide text-paper sm:text-xl">
+              <div
+                className={`text-lg leading-relaxed text-paper sm:text-xl ${
+                  displayMode === "romaji" ? "font-mono tracking-normal" : "font-display tracking-wide"
+                }`}
+              >
                 {line.tokens.map((token, ti) => (
-                  <WordToken key={ti} token={token} active={isActive && ti === activeWordIndex} />
+                  <WordToken
+                    key={ti}
+                    token={token}
+                    active={isActive && ti === activeWordIndex}
+                    displayMode={displayMode}
+                  />
                 ))}
               </div>
               {isActive && (
