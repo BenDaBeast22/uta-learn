@@ -1,0 +1,2221 @@
+[
+  {
+    "id": "l1",
+    "start": 0.42,
+    "end": 4.42,
+    "tokens": [
+      {
+        "surface": "新",
+        "romaji": "shin",
+        "meaning": "new; neo-",
+        "pos": "名詞接続"
+      },
+      {
+        "surface": "時代",
+        "romaji": "jidai",
+        "meaning": "period; epoch; era; age",
+        "pos": "noun"
+      },
+      {
+        "surface": "は",
+        "romaji": "ha",
+        "meaning": "indicates sentence topic",
+        "pos": "particle"
+      },
+      {
+        "surface": "この",
+        "romaji": "kono",
+        "meaning": "this",
+        "pos": "adjectival"
+      },
+      {
+        "surface": "未来",
+        "romaji": "mirai",
+        "meaning": "(distant) future",
+        "pos": "noun"
+      },
+      {
+        "surface": "だ",
+        "romaji": "da",
+        "meaning": "be; is",
+        "pos": "auxiliary verb"
+      }
+    ]
+  },
+  {
+    "id": "l2",
+    "start": 4.42,
+    "end": 7.41,
+    "tokens": [
+      {
+        "surface": "世界中",
+        "romaji": "sekaijuu",
+        "meaning": "around the world; throughout the world",
+        "pos": "noun"
+      },
+      {
+        "surface": "全部",
+        "romaji": "zenbu",
+        "meaning": "all; entire; whole; altogether",
+        "pos": "noun"
+      }
+    ]
+  },
+  {
+    "id": "l3",
+    "start": 7.41,
+    "end": 12.18,
+    "tokens": [
+      {
+        "surface": "変え",
+        "romaji": "kae",
+        "meaning": "to change; to alter; to transform; to convert; to turn; to vary",
+        "pos": "verb"
+      },
+      {
+        "surface": "て",
+        "romaji": "te",
+        "meaning": "hand; arm",
+        "pos": "particle"
+      },
+      {
+        "surface": "しまえ",
+        "romaji": "shimae",
+        "meaning": "to finish; to stop; to end; to put an end to; to bring to a close",
+        "pos": "verb"
+      },
+      {
+        "surface": "ば",
+        "romaji": "ba",
+        "meaning": "place; spot; space",
+        "pos": "particle"
+      }
+    ]
+  },
+  {
+    "id": "l4",
+    "start": 12.18,
+    "end": 22.64,
+    "tokens": [
+      {
+        "surface": "変え",
+        "romaji": "kae",
+        "meaning": "to change; to alter; to transform; to convert; to turn; to vary",
+        "pos": "verb"
+      },
+      {
+        "surface": "て",
+        "romaji": "te",
+        "meaning": "hand; arm",
+        "pos": "particle"
+      },
+      {
+        "surface": "しまえ",
+        "romaji": "shimae",
+        "meaning": "to finish; to stop; to end; to put an end to; to bring to a close",
+        "pos": "verb"
+      },
+      {
+        "surface": "ば",
+        "romaji": "ba",
+        "meaning": "place; spot; space",
+        "pos": "particle"
+      }
+    ]
+  },
+  {
+    "id": "l5",
+    "start": 22.64,
+    "end": 44.08,
+    "tokens": [
+      {
+        "surface": "♪",
+        "romaji": "♪",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "noun"
+      }
+    ]
+  },
+  {
+    "id": "l6",
+    "start": 44.08,
+    "end": 44.91,
+    "tokens": [
+      {
+        "surface": "ジャマモノ",
+        "romaji": "jamamono",
+        "meaning": "obstacle; hindrance; impediment; obstruction",
+        "pos": "noun"
+      }
+    ]
+  },
+  {
+    "id": "l7",
+    "start": 44.91,
+    "end": 45.67,
+    "tokens": [
+      {
+        "surface": "や",
+        "romaji": "ya",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "noun"
+      },
+      {
+        "surface": "な",
+        "romaji": "na",
+        "meaning": "be; is",
+        "pos": "auxiliary verb"
+      },
+      {
+        "surface": "もの",
+        "romaji": "mono",
+        "meaning": "thing; object; article; stuff; substance",
+        "pos": "noun"
+      }
+    ]
+  },
+  {
+    "id": "l8",
+    "start": 45.67,
+    "end": 46.97,
+    "tokens": [
+      {
+        "surface": "なんて",
+        "romaji": "nante",
+        "meaning": "how ...!; what ...!",
+        "pos": "particle"
+      },
+      {
+        "surface": "消し",
+        "romaji": "keshi",
+        "meaning": "to erase; to rub out; to rub off; to cross out; to delete",
+        "pos": "verb"
+      },
+      {
+        "surface": "て",
+        "romaji": "te",
+        "meaning": "hand; arm",
+        "pos": "particle"
+      }
+    ]
+  },
+  {
+    "id": "l9",
+    "start": 46.97,
+    "end": 49.54,
+    "tokens": [
+      {
+        "surface": "この世",
+        "romaji": "konoyo",
+        "meaning": "this world; this life; world of the living",
+        "pos": "noun"
+      },
+      {
+        "surface": "と",
+        "romaji": "to",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "particle"
+      },
+      {
+        "surface": "メタモルフォーゼ",
+        "romaji": "metamorufuooze",
+        "meaning": "metamorphosis",
+        "pos": "noun"
+      },
+      {
+        "surface": "しよ",
+        "romaji": "shiyo",
+        "meaning": "to do; to carry out; to perform",
+        "pos": "verb"
+      },
+      {
+        "surface": "う",
+        "romaji": "u",
+        "meaning": "the Rabbit (fourth sign of the Chinese zodiac); the Hare",
+        "pos": "auxiliary verb"
+      },
+      {
+        "surface": "ぜ",
+        "romaji": "ze",
+        "meaning": "I can tell you",
+        "pos": "particle"
+      }
+    ]
+  },
+  {
+    "id": "l10",
+    "start": 49.54,
+    "end": 51.34,
+    "tokens": [
+      {
+        "surface": "ミュージック",
+        "romaji": "myuujikku",
+        "meaning": "music",
+        "pos": "noun"
+      }
+    ]
+  },
+  {
+    "id": "l11",
+    "start": 51.34,
+    "end": 52.43,
+    "tokens": [
+      {
+        "surface": "キミ",
+        "romaji": "kimi",
+        "meaning": "you; buddy; pal",
+        "pos": "noun"
+      },
+      {
+        "surface": "が",
+        "romaji": "ga",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "particle"
+      },
+      {
+        "surface": "起こす",
+        "romaji": "okosu",
+        "meaning": "to raise; to raise up; to set up; to pick up; to stand (something) up",
+        "pos": "verb"
+      }
+    ]
+  },
+  {
+    "id": "l12",
+    "start": 52.43,
+    "end": 53.54,
+    "tokens": [
+      {
+        "surface": "マジック",
+        "romaji": "majikku",
+        "meaning": "magic",
+        "pos": "noun"
+      }
+    ]
+  },
+  {
+    "id": "l13",
+    "start": 53.54,
+    "end": 55.06,
+    "tokens": [
+      {
+        "surface": "♪",
+        "romaji": "♪",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "noun"
+      }
+    ]
+  },
+  {
+    "id": "l14",
+    "start": 55.06,
+    "end": 57.75,
+    "tokens": [
+      {
+        "surface": "目",
+        "romaji": "me",
+        "meaning": "eye; eyeball",
+        "pos": "noun"
+      },
+      {
+        "surface": "を",
+        "romaji": "wo",
+        "meaning": "indicates direct object of action",
+        "pos": "particle"
+      },
+      {
+        "surface": "閉じれ",
+        "romaji": "tojire",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "verb"
+      },
+      {
+        "surface": "ば",
+        "romaji": "ba",
+        "meaning": "place; spot; space",
+        "pos": "particle"
+      },
+      {
+        "surface": "未来",
+        "romaji": "mirai",
+        "meaning": "(distant) future",
+        "pos": "noun"
+      },
+      {
+        "surface": "が",
+        "romaji": "ga",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "particle"
+      },
+      {
+        "surface": "開い",
+        "romaji": "hirai",
+        "meaning": "to open; to undo; to unseal; to unpack",
+        "pos": "verb"
+      },
+      {
+        "surface": "て",
+        "romaji": "te",
+        "meaning": "hand; arm",
+        "pos": "particle"
+      }
+    ]
+  },
+  {
+    "id": "l15",
+    "start": 57.75,
+    "end": 62.14,
+    "tokens": [
+      {
+        "surface": "いつ",
+        "romaji": "itsu",
+        "meaning": "when; at what time; how soon",
+        "pos": "noun"
+      },
+      {
+        "surface": "まで",
+        "romaji": "made",
+        "meaning": "until (a time); till; to; up to",
+        "pos": "particle"
+      },
+      {
+        "surface": "も",
+        "romaji": "mo",
+        "meaning": "too; also; in addition; as well; (not) either (in a negative sentence)",
+        "pos": "particle"
+      },
+      {
+        "surface": "終わり",
+        "romaji": "owari",
+        "meaning": "to end; to come to an end; to finish; to close; to be over",
+        "pos": "verb"
+      },
+      {
+        "surface": "が",
+        "romaji": "ga",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "particle"
+      },
+      {
+        "surface": "来",
+        "romaji": "ko",
+        "meaning": "to come (spatially or temporally); to approach; to arrive",
+        "pos": "verb"
+      },
+      {
+        "surface": "ない",
+        "romaji": "nai",
+        "meaning": "nonexistent; not being (there)",
+        "pos": "auxiliary verb"
+      },
+      {
+        "surface": "よう",
+        "romaji": "you",
+        "meaning": "appearing ...; looking ...",
+        "pos": "noun"
+      },
+      {
+        "surface": "に",
+        "romaji": "ni",
+        "meaning": "two; 2",
+        "pos": "particle"
+      },
+      {
+        "surface": "って",
+        "romaji": "tte",
+        "meaning": "you said; he said; she said; they said",
+        "pos": "particle"
+      }
+    ]
+  },
+  {
+    "id": "l16",
+    "start": 62.14,
+    "end": 64.66,
+    "tokens": [
+      {
+        "surface": "この",
+        "romaji": "kono",
+        "meaning": "this",
+        "pos": "adjectival"
+      },
+      {
+        "surface": "歌",
+        "romaji": "uta",
+        "meaning": "song; singing",
+        "pos": "noun"
+      },
+      {
+        "surface": "を",
+        "romaji": "wo",
+        "meaning": "indicates direct object of action",
+        "pos": "particle"
+      },
+      {
+        "surface": "歌う",
+        "romaji": "utau",
+        "meaning": "to sing",
+        "pos": "verb"
+      },
+      {
+        "surface": "よ",
+        "romaji": "yo",
+        "meaning": "world; society; public",
+        "pos": "particle"
+      }
+    ]
+  },
+  {
+    "id": "l17",
+    "start": 64.66,
+    "end": 66.3,
+    "tokens": [
+      {
+        "surface": "Ooh",
+        "romaji": "Ooh",
+        "meaning": "don't",
+        "pos": "noun"
+      }
+    ]
+  },
+  {
+    "id": "l18",
+    "start": 66.3,
+    "end": 67.24,
+    "tokens": [
+      {
+        "surface": "Do",
+        "romaji": "Do",
+        "meaning": "doh (1st note of a major scale in movable-do solfège); do",
+        "pos": "noun"
+      },
+      {
+        "surface": " ",
+        "romaji": "",
+        "meaning": "",
+        "skip": true
+      },
+      {
+        "surface": "you",
+        "romaji": "you",
+        "meaning": "appearing ...; looking ...",
+        "pos": "noun"
+      },
+      {
+        "surface": " ",
+        "romaji": "",
+        "meaning": "",
+        "skip": true
+      },
+      {
+        "surface": "wanna",
+        "romaji": "wanna",
+        "meaning": "inside the bay",
+        "pos": "noun"
+      },
+      {
+        "surface": " ",
+        "romaji": "",
+        "meaning": "",
+        "skip": true
+      },
+      {
+        "surface": "play",
+        "romaji": "play",
+        "meaning": "play; playing; game",
+        "pos": "noun"
+      },
+      {
+        "surface": "?",
+        "romaji": "?",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "noun"
+      }
+    ]
+  },
+  {
+    "id": "l19",
+    "start": 67.24,
+    "end": 68.97,
+    "tokens": [
+      {
+        "surface": "リアル",
+        "romaji": "riaru",
+        "meaning": "real; realistic; true to life",
+        "pos": "noun"
+      },
+      {
+        "surface": "ゲーム",
+        "romaji": "geemu",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "noun"
+      },
+      {
+        "surface": " ",
+        "romaji": "",
+        "meaning": "",
+        "skip": true
+      },
+      {
+        "surface": "ギリギリ",
+        "romaji": "girigiri",
+        "meaning": "just barely; only just; at the very limit; at the last moment",
+        "pos": "noun"
+      }
+    ]
+  },
+  {
+    "id": "l20",
+    "start": 68.97,
+    "end": 71.97,
+    "tokens": [
+      {
+        "surface": "綱渡り",
+        "romaji": "tsunawatari",
+        "meaning": "tightrope walking; high-wire act; funambulism",
+        "pos": "noun"
+      },
+      {
+        "surface": "みたい",
+        "romaji": "mitai",
+        "meaning": "-like; sort of; similar to; resembling",
+        "pos": "noun"
+      },
+      {
+        "surface": "な",
+        "romaji": "na",
+        "meaning": "be; is",
+        "pos": "auxiliary verb"
+      },
+      {
+        "surface": "旋律",
+        "romaji": "senritsu",
+        "meaning": "melody; tune",
+        "pos": "noun"
+      }
+    ]
+  },
+  {
+    "id": "l21",
+    "start": 71.97,
+    "end": 74.48,
+    "tokens": [
+      {
+        "surface": "認め",
+        "romaji": "mitome",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "verb"
+      },
+      {
+        "surface": "ない",
+        "romaji": "nai",
+        "meaning": "nonexistent; not being (there)",
+        "pos": "auxiliary verb"
+      },
+      {
+        "surface": "戻れ",
+        "romaji": "modore",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "verb"
+      },
+      {
+        "surface": "ない",
+        "romaji": "nai",
+        "meaning": "nonexistent; not being (there)",
+        "pos": "auxiliary verb"
+      },
+      {
+        "surface": "忘れ",
+        "romaji": "wasure",
+        "meaning": "to forget; to leave carelessly; to be forgetful of; to forget about; to forget (an article)",
+        "pos": "verb"
+      },
+      {
+        "surface": "たい",
+        "romaji": "tai",
+        "meaning": "sea bream (esp. Pagrus major); porgy",
+        "pos": "auxiliary verb"
+      }
+    ]
+  },
+  {
+    "id": "l22",
+    "start": 74.48,
+    "end": 76.65,
+    "tokens": [
+      {
+        "surface": "夢",
+        "romaji": "yume",
+        "meaning": "dream",
+        "pos": "noun"
+      },
+      {
+        "surface": "の",
+        "romaji": "no",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "particle"
+      },
+      {
+        "surface": "中",
+        "romaji": "naka",
+        "meaning": "medium (size); average (grade, level, etc.); middle",
+        "pos": "noun"
+      },
+      {
+        "surface": "に",
+        "romaji": "ni",
+        "meaning": "two; 2",
+        "pos": "particle"
+      },
+      {
+        "surface": "居",
+        "romaji": "i",
+        "meaning": "to be (of animate objects); to exist",
+        "pos": "verb"
+      },
+      {
+        "surface": "させ",
+        "romaji": "sase",
+        "meaning": "(any) particular; notable; noteworthy; significant; considerable",
+        "pos": "verb"
+      },
+      {
+        "surface": "て",
+        "romaji": "te",
+        "meaning": "hand; arm",
+        "pos": "particle"
+      }
+    ]
+  },
+  {
+    "id": "l23",
+    "start": 76.65,
+    "end": 78.87,
+    "tokens": [
+      {
+        "surface": "I",
+        "romaji": "I",
+        "meaning": "1st (in a sequence denoted by the iroha system); a; i",
+        "pos": "noun"
+      },
+      {
+        "surface": " ",
+        "romaji": "",
+        "meaning": "",
+        "skip": true
+      },
+      {
+        "surface": "wanna",
+        "romaji": "wanna",
+        "meaning": "inside the bay",
+        "pos": "noun"
+      },
+      {
+        "surface": " ",
+        "romaji": "",
+        "meaning": "",
+        "skip": true
+      },
+      {
+        "surface": "be",
+        "romaji": "be",
+        "meaning": "word used at sentence-end (like a particle) to indicate speculation, volition or invitation",
+        "pos": "noun"
+      },
+      {
+        "surface": " ",
+        "romaji": "",
+        "meaning": "",
+        "skip": true
+      },
+      {
+        "surface": "free",
+        "romaji": "free",
+        "meaning": "free (of charge); gratuitous",
+        "pos": "noun"
+      }
+    ]
+  },
+  {
+    "id": "l24",
+    "start": 78.87,
+    "end": 81.75,
+    "tokens": [
+      {
+        "surface": "見える",
+        "romaji": "mieru",
+        "meaning": "to be seen; to be visible; to be in sight",
+        "pos": "verb"
+      },
+      {
+        "surface": "よ",
+        "romaji": "yo",
+        "meaning": "world; society; public",
+        "pos": "particle"
+      },
+      {
+        "surface": "新",
+        "romaji": "shin",
+        "meaning": "new; neo-",
+        "pos": "名詞接続"
+      },
+      {
+        "surface": "時代",
+        "romaji": "jidai",
+        "meaning": "period; epoch; era; age",
+        "pos": "noun"
+      },
+      {
+        "surface": "が",
+        "romaji": "ga",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "particle"
+      }
+    ]
+  },
+  {
+    "id": "l25",
+    "start": 81.75,
+    "end": 84.5,
+    "tokens": [
+      {
+        "surface": "世界",
+        "romaji": "sekai",
+        "meaning": "the world; society; the universe",
+        "pos": "noun"
+      },
+      {
+        "surface": "の",
+        "romaji": "no",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "particle"
+      },
+      {
+        "surface": "向こう",
+        "romaji": "mukou",
+        "meaning": "opposite side; other side",
+        "pos": "noun"
+      },
+      {
+        "surface": "へ",
+        "romaji": "he",
+        "meaning": "to; towards; for",
+        "pos": "particle"
+      }
+    ]
+  },
+  {
+    "id": "l26",
+    "start": 84.5,
+    "end": 85.3,
+    "tokens": [
+      {
+        "surface": "さあ",
+        "romaji": "saa",
+        "meaning": "come (on); come now; come along; here",
+        "pos": "interjection"
+      },
+      {
+        "surface": "行く",
+        "romaji": "iku",
+        "meaning": "to go; to move (towards); to head (towards); to leave (for)",
+        "pos": "verb"
+      },
+      {
+        "surface": "よ",
+        "romaji": "yo",
+        "meaning": "world; society; public",
+        "pos": "particle"
+      }
+    ]
+  },
+  {
+    "id": "l27",
+    "start": 85.3,
+    "end": 87.24,
+    "tokens": [
+      {
+        "surface": "new",
+        "romaji": "new",
+        "meaning": "new; novel; fresh; recent; latest; up-to-date; modern",
+        "pos": "noun"
+      },
+      {
+        "surface": " ",
+        "romaji": "",
+        "meaning": "",
+        "skip": true
+      },
+      {
+        "surface": "world",
+        "romaji": "world",
+        "meaning": "world; society; public",
+        "pos": "noun"
+      }
+    ]
+  },
+  {
+    "id": "l28",
+    "start": 87.24,
+    "end": 88.18,
+    "tokens": [
+      {
+        "surface": "♪",
+        "romaji": "♪",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "noun"
+      }
+    ]
+  },
+  {
+    "id": "l29",
+    "start": 88.18,
+    "end": 90.51,
+    "tokens": [
+      {
+        "surface": "新",
+        "romaji": "shin",
+        "meaning": "new; neo-",
+        "pos": "名詞接続"
+      },
+      {
+        "surface": "時代",
+        "romaji": "jidai",
+        "meaning": "period; epoch; era; age",
+        "pos": "noun"
+      },
+      {
+        "surface": "は",
+        "romaji": "ha",
+        "meaning": "indicates sentence topic",
+        "pos": "particle"
+      },
+      {
+        "surface": "この",
+        "romaji": "kono",
+        "meaning": "this",
+        "pos": "adjectival"
+      },
+      {
+        "surface": "未来",
+        "romaji": "mirai",
+        "meaning": "(distant) future",
+        "pos": "noun"
+      },
+      {
+        "surface": "だ",
+        "romaji": "da",
+        "meaning": "be; is",
+        "pos": "auxiliary verb"
+      }
+    ]
+  },
+  {
+    "id": "l30",
+    "start": 90.51,
+    "end": 92.65,
+    "tokens": [
+      {
+        "surface": "世界中",
+        "romaji": "sekaijuu",
+        "meaning": "around the world; throughout the world",
+        "pos": "noun"
+      },
+      {
+        "surface": "全部",
+        "romaji": "zenbu",
+        "meaning": "all; entire; whole; altogether",
+        "pos": "noun"
+      }
+    ]
+  },
+  {
+    "id": "l31",
+    "start": 92.65,
+    "end": 95.49,
+    "tokens": [
+      {
+        "surface": "変え",
+        "romaji": "kae",
+        "meaning": "to change; to alter; to transform; to convert; to turn; to vary",
+        "pos": "verb"
+      },
+      {
+        "surface": "て",
+        "romaji": "te",
+        "meaning": "hand; arm",
+        "pos": "particle"
+      },
+      {
+        "surface": "しまえ",
+        "romaji": "shimae",
+        "meaning": "to finish; to stop; to end; to put an end to; to bring to a close",
+        "pos": "verb"
+      },
+      {
+        "surface": "ば",
+        "romaji": "ba",
+        "meaning": "place; spot; space",
+        "pos": "particle"
+      }
+    ]
+  },
+  {
+    "id": "l32",
+    "start": 95.49,
+    "end": 99.15,
+    "tokens": [
+      {
+        "surface": "変え",
+        "romaji": "kae",
+        "meaning": "to change; to alter; to transform; to convert; to turn; to vary",
+        "pos": "verb"
+      },
+      {
+        "surface": "て",
+        "romaji": "te",
+        "meaning": "hand; arm",
+        "pos": "particle"
+      },
+      {
+        "surface": "しまえ",
+        "romaji": "shimae",
+        "meaning": "to finish; to stop; to end; to put an end to; to bring to a close",
+        "pos": "verb"
+      },
+      {
+        "surface": "ば",
+        "romaji": "ba",
+        "meaning": "place; spot; space",
+        "pos": "particle"
+      }
+    ]
+  },
+  {
+    "id": "l33",
+    "start": 99.15,
+    "end": 103.62,
+    "tokens": [
+      {
+        "surface": "果てしない",
+        "romaji": "hateshinai",
+        "meaning": "endless; boundless; everlasting",
+        "pos": "adjective"
+      },
+      {
+        "surface": "音楽",
+        "romaji": "ongaku",
+        "meaning": "music",
+        "pos": "noun"
+      },
+      {
+        "surface": "が",
+        "romaji": "ga",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "particle"
+      },
+      {
+        "surface": "もっと",
+        "romaji": "motto",
+        "meaning": "(some) more; even more; longer; further",
+        "pos": "adverb"
+      },
+      {
+        "surface": "届く",
+        "romaji": "todoku",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "verb"
+      },
+      {
+        "surface": "よう",
+        "romaji": "you",
+        "meaning": "appearing ...; looking ...",
+        "pos": "noun"
+      },
+      {
+        "surface": "に",
+        "romaji": "ni",
+        "meaning": "two; 2",
+        "pos": "particle"
+      }
+    ]
+  },
+  {
+    "id": "l34",
+    "start": 103.62,
+    "end": 106.29,
+    "tokens": [
+      {
+        "surface": "夢",
+        "romaji": "yume",
+        "meaning": "dream",
+        "pos": "noun"
+      },
+      {
+        "surface": "は",
+        "romaji": "ha",
+        "meaning": "indicates sentence topic",
+        "pos": "particle"
+      },
+      {
+        "surface": "見",
+        "romaji": "mi",
+        "meaning": "to see; to look; to watch; to view; to observe",
+        "pos": "verb"
+      },
+      {
+        "surface": "ない",
+        "romaji": "nai",
+        "meaning": "nonexistent; not being (there)",
+        "pos": "auxiliary verb"
+      },
+      {
+        "surface": "わ",
+        "romaji": "wa",
+        "meaning": "ring; circle; loop",
+        "pos": "particle"
+      }
+    ]
+  },
+  {
+    "id": "l35",
+    "start": 106.29,
+    "end": 110.44,
+    "tokens": [
+      {
+        "surface": "キミ",
+        "romaji": "kimi",
+        "meaning": "you; buddy; pal",
+        "pos": "noun"
+      },
+      {
+        "surface": "が",
+        "romaji": "ga",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "particle"
+      },
+      {
+        "surface": "話し",
+        "romaji": "hanashi",
+        "meaning": "to talk; to speak; to converse; to chat",
+        "pos": "verb"
+      },
+      {
+        "surface": "た",
+        "romaji": "ta",
+        "meaning": "rice field",
+        "pos": "auxiliary verb"
+      },
+      {
+        "surface": " ",
+        "romaji": "",
+        "meaning": "",
+        "skip": true
+      },
+      {
+        "surface": "「",
+        "romaji": "",
+        "meaning": "",
+        "skip": true
+      },
+      {
+        "surface": "ボク",
+        "romaji": "boku",
+        "meaning": "I; me",
+        "pos": "noun"
+      },
+      {
+        "surface": "を",
+        "romaji": "wo",
+        "meaning": "indicates direct object of action",
+        "pos": "particle"
+      },
+      {
+        "surface": "信じ",
+        "romaji": "shinji",
+        "meaning": "to believe; to believe in; to place trust in; to confide in; to have faith in",
+        "pos": "verb"
+      },
+      {
+        "surface": "て",
+        "romaji": "te",
+        "meaning": "hand; arm",
+        "pos": "particle"
+      },
+      {
+        "surface": "」",
+        "romaji": "",
+        "meaning": "",
+        "skip": true
+      }
+    ]
+  },
+  {
+    "id": "l36",
+    "start": 110.44,
+    "end": 118.59,
+    "tokens": [
+      {
+        "surface": "♪",
+        "romaji": "♪",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "noun"
+      }
+    ]
+  },
+  {
+    "id": "l37",
+    "start": 118.59,
+    "end": 123.85,
+    "tokens": [
+      {
+        "surface": "Ooh",
+        "romaji": "Ooh",
+        "meaning": "don't",
+        "pos": "noun"
+      }
+    ]
+  },
+  {
+    "id": "l38",
+    "start": 123.85,
+    "end": 132.01,
+    "tokens": [
+      {
+        "surface": "♪",
+        "romaji": "♪",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "noun"
+      }
+    ]
+  },
+  {
+    "id": "l39",
+    "start": 132.01,
+    "end": 134.56,
+    "tokens": [
+      {
+        "surface": "あれこれ",
+        "romaji": "arekore",
+        "meaning": "this and that; this or that; one thing or another; this way and that",
+        "pos": "noun"
+      },
+      {
+        "surface": "いら",
+        "romaji": "ira",
+        "meaning": "to be (of animate objects); to exist",
+        "pos": "verb"
+      },
+      {
+        "surface": "ない",
+        "romaji": "nai",
+        "meaning": "nonexistent; not being (there)",
+        "pos": "auxiliary verb"
+      },
+      {
+        "surface": "もの",
+        "romaji": "mono",
+        "meaning": "thing; object; article; stuff; substance",
+        "pos": "noun"
+      },
+      {
+        "surface": "は",
+        "romaji": "ha",
+        "meaning": "indicates sentence topic",
+        "pos": "particle"
+      },
+      {
+        "surface": "消し",
+        "romaji": "keshi",
+        "meaning": "to erase; to rub out; to rub off; to cross out; to delete",
+        "pos": "verb"
+      },
+      {
+        "surface": "て",
+        "romaji": "te",
+        "meaning": "hand; arm",
+        "pos": "particle"
+      }
+    ]
+  },
+  {
+    "id": "l40",
+    "start": 134.56,
+    "end": 137.26,
+    "tokens": [
+      {
+        "surface": "リアル",
+        "romaji": "riaru",
+        "meaning": "real; realistic; true to life",
+        "pos": "noun"
+      },
+      {
+        "surface": "を",
+        "romaji": "wo",
+        "meaning": "indicates direct object of action",
+        "pos": "particle"
+      },
+      {
+        "surface": "カラフル",
+        "romaji": "karafuru",
+        "meaning": "colorful; colourful",
+        "pos": "noun"
+      },
+      {
+        "surface": "に",
+        "romaji": "ni",
+        "meaning": "two; 2",
+        "pos": "particle"
+      },
+      {
+        "surface": "越えよ",
+        "romaji": "koeyo",
+        "meaning": "to cross over; to cross; to pass through; to pass over (out of); to go beyond; to go past",
+        "pos": "verb"
+      },
+      {
+        "surface": "う",
+        "romaji": "u",
+        "meaning": "the Rabbit (fourth sign of the Chinese zodiac); the Hare",
+        "pos": "auxiliary verb"
+      },
+      {
+        "surface": "ぜ",
+        "romaji": "ze",
+        "meaning": "I can tell you",
+        "pos": "particle"
+      }
+    ]
+  },
+  {
+    "id": "l41",
+    "start": 137.26,
+    "end": 139.11,
+    "tokens": [
+      {
+        "surface": "ミュージック",
+        "romaji": "myuujikku",
+        "meaning": "music",
+        "pos": "noun"
+      }
+    ]
+  },
+  {
+    "id": "l42",
+    "start": 139.11,
+    "end": 140.16,
+    "tokens": [
+      {
+        "surface": "今",
+        "romaji": "ima",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "noun"
+      },
+      {
+        "surface": "始まる",
+        "romaji": "hajimaru",
+        "meaning": "to begin; to start; to commence",
+        "pos": "verb"
+      }
+    ]
+  },
+  {
+    "id": "l43",
+    "start": 140.16,
+    "end": 142.65,
+    "tokens": [
+      {
+        "surface": "ライジング",
+        "romaji": "raijingu",
+        "meaning": "rising",
+        "pos": "noun"
+      }
+    ]
+  },
+  {
+    "id": "l44",
+    "start": 142.65,
+    "end": 145.61,
+    "tokens": [
+      {
+        "surface": "目",
+        "romaji": "me",
+        "meaning": "eye; eyeball",
+        "pos": "noun"
+      },
+      {
+        "surface": "を",
+        "romaji": "wo",
+        "meaning": "indicates direct object of action",
+        "pos": "particle"
+      },
+      {
+        "surface": "つぶり",
+        "romaji": "tsuburi",
+        "meaning": "to close (one's eyes); to shut",
+        "pos": "verb"
+      },
+      {
+        "surface": "みんな",
+        "romaji": "minna",
+        "meaning": "everyone; everybody; all",
+        "pos": "noun"
+      },
+      {
+        "surface": "で",
+        "romaji": "de",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "particle"
+      },
+      {
+        "surface": "逃げよ",
+        "romaji": "nigeyo",
+        "meaning": "to run away; to flee; to get away (e.g. from danger); to escape; to break out; to leave (e.g. one's spouse); to take cover",
+        "pos": "verb"
+      },
+      {
+        "surface": "う",
+        "romaji": "u",
+        "meaning": "the Rabbit (fourth sign of the Chinese zodiac); the Hare",
+        "pos": "auxiliary verb"
+      },
+      {
+        "surface": "よ",
+        "romaji": "yo",
+        "meaning": "world; society; public",
+        "pos": "particle"
+      }
+    ]
+  },
+  {
+    "id": "l45",
+    "start": 145.61,
+    "end": 150.08,
+    "tokens": [
+      {
+        "surface": "今",
+        "romaji": "ima",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "noun"
+      },
+      {
+        "surface": "より",
+        "romaji": "yori",
+        "meaning": "than",
+        "pos": "particle"
+      },
+      {
+        "surface": "イイ",
+        "romaji": "ii",
+        "meaning": "Iran-Iraq",
+        "pos": "adjective"
+      },
+      {
+        "surface": "モノ",
+        "romaji": "mono",
+        "meaning": "mono",
+        "pos": "noun"
+      },
+      {
+        "surface": "を",
+        "romaji": "wo",
+        "meaning": "indicates direct object of action",
+        "pos": "particle"
+      },
+      {
+        "surface": "見せ",
+        "romaji": "mise",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "verb"
+      },
+      {
+        "surface": "て",
+        "romaji": "te",
+        "meaning": "hand; arm",
+        "pos": "particle"
+      },
+      {
+        "surface": "あげる",
+        "romaji": "ageru",
+        "meaning": "to raise; to elevate",
+        "pos": "verb"
+      },
+      {
+        "surface": "よ",
+        "romaji": "yo",
+        "meaning": "world; society; public",
+        "pos": "particle"
+      }
+    ]
+  },
+  {
+    "id": "l46",
+    "start": 150.08,
+    "end": 152.57,
+    "tokens": [
+      {
+        "surface": "この",
+        "romaji": "kono",
+        "meaning": "this",
+        "pos": "adjectival"
+      },
+      {
+        "surface": "歌",
+        "romaji": "uta",
+        "meaning": "song; singing",
+        "pos": "noun"
+      },
+      {
+        "surface": "を",
+        "romaji": "wo",
+        "meaning": "indicates direct object of action",
+        "pos": "particle"
+      },
+      {
+        "surface": "歌え",
+        "romaji": "utae",
+        "meaning": "to sing",
+        "pos": "verb"
+      },
+      {
+        "surface": "ば",
+        "romaji": "ba",
+        "meaning": "place; spot; space",
+        "pos": "particle"
+      }
+    ]
+  },
+  {
+    "id": "l47",
+    "start": 152.57,
+    "end": 154.03,
+    "tokens": [
+      {
+        "surface": "Aah",
+        "romaji": "Aah",
+        "meaning": "ah!; oh!; alas!",
+        "pos": "noun"
+      }
+    ]
+  },
+  {
+    "id": "l48",
+    "start": 154.03,
+    "end": 155.07,
+    "tokens": [
+      {
+        "surface": "Do",
+        "romaji": "Do",
+        "meaning": "doh (1st note of a major scale in movable-do solfège); do",
+        "pos": "noun"
+      },
+      {
+        "surface": " ",
+        "romaji": "",
+        "meaning": "",
+        "skip": true
+      },
+      {
+        "surface": "you",
+        "romaji": "you",
+        "meaning": "appearing ...; looking ...",
+        "pos": "noun"
+      },
+      {
+        "surface": " ",
+        "romaji": "",
+        "meaning": "",
+        "skip": true
+      },
+      {
+        "surface": "wanna",
+        "romaji": "wanna",
+        "meaning": "inside the bay",
+        "pos": "noun"
+      },
+      {
+        "surface": " ",
+        "romaji": "",
+        "meaning": "",
+        "skip": true
+      },
+      {
+        "surface": "play",
+        "romaji": "play",
+        "meaning": "play; playing; game",
+        "pos": "noun"
+      },
+      {
+        "surface": "?",
+        "romaji": "?",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "noun"
+      }
+    ]
+  },
+  {
+    "id": "l49",
+    "start": 155.07,
+    "end": 156.49,
+    "tokens": [
+      {
+        "surface": "リアル",
+        "romaji": "riaru",
+        "meaning": "real; realistic; true to life",
+        "pos": "noun"
+      },
+      {
+        "surface": "ゲーム",
+        "romaji": "geemu",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "noun"
+      },
+      {
+        "surface": " ",
+        "romaji": "",
+        "meaning": "",
+        "skip": true
+      },
+      {
+        "surface": "ギリギリ",
+        "romaji": "girigiri",
+        "meaning": "just barely; only just; at the very limit; at the last moment",
+        "pos": "noun"
+      }
+    ]
+  },
+  {
+    "id": "l50",
+    "start": 156.49,
+    "end": 159.47,
+    "tokens": [
+      {
+        "surface": "綱渡り",
+        "romaji": "tsunawatari",
+        "meaning": "tightrope walking; high-wire act; funambulism",
+        "pos": "noun"
+      },
+      {
+        "surface": "みたい",
+        "romaji": "mitai",
+        "meaning": "-like; sort of; similar to; resembling",
+        "pos": "noun"
+      },
+      {
+        "surface": "な",
+        "romaji": "na",
+        "meaning": "be; is",
+        "pos": "auxiliary verb"
+      },
+      {
+        "surface": "運命",
+        "romaji": "unmei",
+        "meaning": "fate; destiny; lot",
+        "pos": "noun"
+      }
+    ]
+  },
+  {
+    "id": "l51",
+    "start": 159.47,
+    "end": 162.33,
+    "tokens": [
+      {
+        "surface": "認め",
+        "romaji": "mitome",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "verb"
+      },
+      {
+        "surface": "ない",
+        "romaji": "nai",
+        "meaning": "nonexistent; not being (there)",
+        "pos": "auxiliary verb"
+      },
+      {
+        "surface": "戻れ",
+        "romaji": "modore",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "verb"
+      },
+      {
+        "surface": "ない",
+        "romaji": "nai",
+        "meaning": "nonexistent; not being (there)",
+        "pos": "auxiliary verb"
+      },
+      {
+        "surface": "忘れ",
+        "romaji": "wasure",
+        "meaning": "to forget; to leave carelessly; to be forgetful of; to forget about; to forget (an article)",
+        "pos": "verb"
+      },
+      {
+        "surface": "たい",
+        "romaji": "tai",
+        "meaning": "sea bream (esp. Pagrus major); porgy",
+        "pos": "auxiliary verb"
+      }
+    ]
+  },
+  {
+    "id": "l52",
+    "start": 162.33,
+    "end": 164.48,
+    "tokens": [
+      {
+        "surface": "夢",
+        "romaji": "yume",
+        "meaning": "dream",
+        "pos": "noun"
+      },
+      {
+        "surface": "の",
+        "romaji": "no",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "particle"
+      },
+      {
+        "surface": "中",
+        "romaji": "naka",
+        "meaning": "medium (size); average (grade, level, etc.); middle",
+        "pos": "noun"
+      },
+      {
+        "surface": "に",
+        "romaji": "ni",
+        "meaning": "two; 2",
+        "pos": "particle"
+      },
+      {
+        "surface": "居",
+        "romaji": "i",
+        "meaning": "to be (of animate objects); to exist",
+        "pos": "verb"
+      },
+      {
+        "surface": "させ",
+        "romaji": "sase",
+        "meaning": "(any) particular; notable; noteworthy; significant; considerable",
+        "pos": "verb"
+      },
+      {
+        "surface": "て",
+        "romaji": "te",
+        "meaning": "hand; arm",
+        "pos": "particle"
+      }
+    ]
+  },
+  {
+    "id": "l53",
+    "start": 164.48,
+    "end": 166.42,
+    "tokens": [
+      {
+        "surface": "I",
+        "romaji": "I",
+        "meaning": "1st (in a sequence denoted by the iroha system); a; i",
+        "pos": "noun"
+      },
+      {
+        "surface": " ",
+        "romaji": "",
+        "meaning": "",
+        "skip": true
+      },
+      {
+        "surface": "wanna",
+        "romaji": "wanna",
+        "meaning": "inside the bay",
+        "pos": "noun"
+      },
+      {
+        "surface": " ",
+        "romaji": "",
+        "meaning": "",
+        "skip": true
+      },
+      {
+        "surface": "be",
+        "romaji": "be",
+        "meaning": "word used at sentence-end (like a particle) to indicate speculation, volition or invitation",
+        "pos": "noun"
+      },
+      {
+        "surface": " ",
+        "romaji": "",
+        "meaning": "",
+        "skip": true
+      },
+      {
+        "surface": "free",
+        "romaji": "free",
+        "meaning": "free (of charge); gratuitous",
+        "pos": "noun"
+      }
+    ]
+  },
+  {
+    "id": "l54",
+    "start": 166.42,
+    "end": 169.33,
+    "tokens": [
+      {
+        "surface": "見える",
+        "romaji": "mieru",
+        "meaning": "to be seen; to be visible; to be in sight",
+        "pos": "verb"
+      },
+      {
+        "surface": "よ",
+        "romaji": "yo",
+        "meaning": "world; society; public",
+        "pos": "particle"
+      },
+      {
+        "surface": "新",
+        "romaji": "shin",
+        "meaning": "new; neo-",
+        "pos": "名詞接続"
+      },
+      {
+        "surface": "時代",
+        "romaji": "jidai",
+        "meaning": "period; epoch; era; age",
+        "pos": "noun"
+      },
+      {
+        "surface": "が",
+        "romaji": "ga",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "particle"
+      }
+    ]
+  },
+  {
+    "id": "l55",
+    "start": 169.33,
+    "end": 171.97,
+    "tokens": [
+      {
+        "surface": "世界",
+        "romaji": "sekai",
+        "meaning": "the world; society; the universe",
+        "pos": "noun"
+      },
+      {
+        "surface": "の",
+        "romaji": "no",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "particle"
+      },
+      {
+        "surface": "向こう",
+        "romaji": "mukou",
+        "meaning": "opposite side; other side",
+        "pos": "noun"
+      },
+      {
+        "surface": "へ",
+        "romaji": "he",
+        "meaning": "to; towards; for",
+        "pos": "particle"
+      }
+    ]
+  },
+  {
+    "id": "l56",
+    "start": 171.97,
+    "end": 173.24,
+    "tokens": [
+      {
+        "surface": "さあ",
+        "romaji": "saa",
+        "meaning": "come (on); come now; come along; here",
+        "pos": "interjection"
+      },
+      {
+        "surface": "行く",
+        "romaji": "iku",
+        "meaning": "to go; to move (towards); to head (towards); to leave (for)",
+        "pos": "verb"
+      },
+      {
+        "surface": "よ",
+        "romaji": "yo",
+        "meaning": "world; society; public",
+        "pos": "particle"
+      }
+    ]
+  },
+  {
+    "id": "l57",
+    "start": 173.24,
+    "end": 174.86,
+    "tokens": [
+      {
+        "surface": "new",
+        "romaji": "new",
+        "meaning": "new; novel; fresh; recent; latest; up-to-date; modern",
+        "pos": "noun"
+      },
+      {
+        "surface": " ",
+        "romaji": "",
+        "meaning": "",
+        "skip": true
+      },
+      {
+        "surface": "world",
+        "romaji": "world",
+        "meaning": "world; society; public",
+        "pos": "noun"
+      }
+    ]
+  },
+  {
+    "id": "l58",
+    "start": 174.86,
+    "end": 175.89,
+    "tokens": [
+      {
+        "surface": "♪",
+        "romaji": "♪",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "noun"
+      }
+    ]
+  },
+  {
+    "id": "l59",
+    "start": 175.89,
+    "end": 177.2,
+    "tokens": [
+      {
+        "surface": "信じ",
+        "romaji": "shinji",
+        "meaning": "to believe; to believe in; to place trust in; to confide in; to have faith in",
+        "pos": "verb"
+      },
+      {
+        "surface": "たい",
+        "romaji": "tai",
+        "meaning": "sea bream (esp. Pagrus major); porgy",
+        "pos": "auxiliary verb"
+      },
+      {
+        "surface": "わ",
+        "romaji": "wa",
+        "meaning": "ring; circle; loop",
+        "pos": "particle"
+      }
+    ]
+  },
+  {
+    "id": "l60",
+    "start": 177.2,
+    "end": 178.68,
+    "tokens": [
+      {
+        "surface": "この",
+        "romaji": "kono",
+        "meaning": "this",
+        "pos": "adjectival"
+      },
+      {
+        "surface": "未来",
+        "romaji": "mirai",
+        "meaning": "(distant) future",
+        "pos": "noun"
+      },
+      {
+        "surface": "を",
+        "romaji": "wo",
+        "meaning": "indicates direct object of action",
+        "pos": "particle"
+      }
+    ]
+  },
+  {
+    "id": "l61",
+    "start": 178.68,
+    "end": 180.36,
+    "tokens": [
+      {
+        "surface": "世界中",
+        "romaji": "sekaijuu",
+        "meaning": "around the world; throughout the world",
+        "pos": "noun"
+      },
+      {
+        "surface": "全部",
+        "romaji": "zenbu",
+        "meaning": "all; entire; whole; altogether",
+        "pos": "noun"
+      }
+    ]
+  },
+  {
+    "id": "l62",
+    "start": 180.36,
+    "end": 183.2,
+    "tokens": [
+      {
+        "surface": "変え",
+        "romaji": "kae",
+        "meaning": "to change; to alter; to transform; to convert; to turn; to vary",
+        "pos": "verb"
+      },
+      {
+        "surface": "て",
+        "romaji": "te",
+        "meaning": "hand; arm",
+        "pos": "particle"
+      },
+      {
+        "surface": "しまえ",
+        "romaji": "shimae",
+        "meaning": "to finish; to stop; to end; to put an end to; to bring to a close",
+        "pos": "verb"
+      },
+      {
+        "surface": "ば",
+        "romaji": "ba",
+        "meaning": "place; spot; space",
+        "pos": "particle"
+      }
+    ]
+  },
+  {
+    "id": "l63",
+    "start": 183.2,
+    "end": 186.61,
+    "tokens": [
+      {
+        "surface": "変え",
+        "romaji": "kae",
+        "meaning": "to change; to alter; to transform; to convert; to turn; to vary",
+        "pos": "verb"
+      },
+      {
+        "surface": "て",
+        "romaji": "te",
+        "meaning": "hand; arm",
+        "pos": "particle"
+      },
+      {
+        "surface": "しまえ",
+        "romaji": "shimae",
+        "meaning": "to finish; to stop; to end; to put an end to; to bring to a close",
+        "pos": "verb"
+      },
+      {
+        "surface": "ば",
+        "romaji": "ba",
+        "meaning": "place; spot; space",
+        "pos": "particle"
+      }
+    ]
+  },
+  {
+    "id": "l64",
+    "start": 186.61,
+    "end": 191.33,
+    "tokens": [
+      {
+        "surface": "果てしない",
+        "romaji": "hateshinai",
+        "meaning": "endless; boundless; everlasting",
+        "pos": "adjective"
+      },
+      {
+        "surface": "音楽",
+        "romaji": "ongaku",
+        "meaning": "music",
+        "pos": "noun"
+      },
+      {
+        "surface": "が",
+        "romaji": "ga",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "particle"
+      },
+      {
+        "surface": "もっと",
+        "romaji": "motto",
+        "meaning": "(some) more; even more; longer; further",
+        "pos": "adverb"
+      },
+      {
+        "surface": "届く",
+        "romaji": "todoku",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "verb"
+      },
+      {
+        "surface": "よう",
+        "romaji": "you",
+        "meaning": "appearing ...; looking ...",
+        "pos": "noun"
+      },
+      {
+        "surface": "に",
+        "romaji": "ni",
+        "meaning": "two; 2",
+        "pos": "particle"
+      }
+    ]
+  },
+  {
+    "id": "l65",
+    "start": 191.33,
+    "end": 194.12,
+    "tokens": [
+      {
+        "surface": "夢",
+        "romaji": "yume",
+        "meaning": "dream",
+        "pos": "noun"
+      },
+      {
+        "surface": "を",
+        "romaji": "wo",
+        "meaning": "indicates direct object of action",
+        "pos": "particle"
+      },
+      {
+        "surface": "見せる",
+        "romaji": "miseru",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "verb"
+      },
+      {
+        "surface": "よ",
+        "romaji": "yo",
+        "meaning": "world; society; public",
+        "pos": "particle"
+      }
+    ]
+  },
+  {
+    "id": "l66",
+    "start": 194.12,
+    "end": 196.76,
+    "tokens": [
+      {
+        "surface": "夢",
+        "romaji": "yume",
+        "meaning": "dream",
+        "pos": "noun"
+      },
+      {
+        "surface": "を",
+        "romaji": "wo",
+        "meaning": "indicates direct object of action",
+        "pos": "particle"
+      },
+      {
+        "surface": "見せる",
+        "romaji": "miseru",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "verb"
+      },
+      {
+        "surface": "よ",
+        "romaji": "yo",
+        "meaning": "world; society; public",
+        "pos": "particle"
+      }
+    ]
+  },
+  {
+    "id": "l67",
+    "start": 196.76,
+    "end": 198.22,
+    "tokens": [
+      {
+        "surface": "新",
+        "romaji": "shin",
+        "meaning": "new; neo-",
+        "pos": "名詞接続"
+      },
+      {
+        "surface": "時代",
+        "romaji": "jidai",
+        "meaning": "period; epoch; era; age",
+        "pos": "noun"
+      },
+      {
+        "surface": "だ",
+        "romaji": "da",
+        "meaning": "be; is",
+        "pos": "auxiliary verb"
+      }
+    ]
+  },
+  {
+    "id": "l68",
+    "start": 198.22,
+    "end": 206.52,
+    "tokens": [
+      {
+        "surface": "♪",
+        "romaji": "♪",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "noun"
+      }
+    ]
+  },
+  {
+    "id": "l69",
+    "start": 206.52,
+    "end": 211.68,
+    "tokens": [
+      {
+        "surface": "Ooh",
+        "romaji": "Ooh",
+        "meaning": "don't",
+        "pos": "noun"
+      }
+    ]
+  },
+  {
+    "id": "l70",
+    "start": 211.68,
+    "end": 218.72,
+    "tokens": [
+      {
+        "surface": "♪",
+        "romaji": "♪",
+        "meaning": "(no dictionary match — fill in manually)",
+        "pos": "noun"
+      }
+    ]
+  },
+  {
+    "id": "l71",
+    "start": 218.72,
+    "end": 222.72,
+    "tokens": [
+      {
+        "surface": "新",
+        "romaji": "shin",
+        "meaning": "new; neo-",
+        "pos": "名詞接続"
+      },
+      {
+        "surface": "時代",
+        "romaji": "jidai",
+        "meaning": "period; epoch; era; age",
+        "pos": "noun"
+      },
+      {
+        "surface": "だ",
+        "romaji": "da",
+        "meaning": "be; is",
+        "pos": "auxiliary verb"
+      }
+    ]
+  }
+]

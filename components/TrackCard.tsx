@@ -1,7 +1,18 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Track } from "@/lib/types";
 
 export default function TrackCard({ track, index }: { track: Track; index: number }) {
+  // 1. Set preferred high-res URL as initial state
+  const highResUrl = `https://i.ytimg.com/vi/${track.youtubeId}/hq720.jpg`;
+  const fallbackUrl = `https://i.ytimg.com/vi/${track.youtubeId}/hqdefault.jpg`;
+
+  const [imgSrc, setImgSrc] = useState(highResUrl);
+  const [isFallback, setIsFallback] = useState(false);
+
   return (
     <Link
       href={`/track/${track.id}`}
@@ -14,15 +25,34 @@ export default function TrackCard({ track, index }: { track: Track; index: numbe
 
       <div className="relative">
         <div className="mb-4 flex items-center justify-between">
-          <span className="font-mono text-xs tracking-widest text-paper/40">
-            {String(index + 1).padStart(2, "0")}
-          </span>
+          <span className="font-mono text-xs tracking-widest text-paper/40">{String(index + 1).padStart(2, "0")}</span>
           <span
             className="rounded-full border px-2.5 py-0.5 font-mono text-[0.65rem] uppercase tracking-wider"
             style={{ borderColor: `${track.accent}66`, color: track.accent }}
           >
             {track.level}
           </span>
+        </div>
+
+        {/* Thumbnail Wrapper */}
+        <div className="relative mb-4 aspect-video w-full overflow-hidden rounded-xl bg-ink-line">
+          <Image
+            src={imgSrc}
+            alt={`${track.title} thumbnail`}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            // Switch to fallback URL if 404
+            onError={() => {
+              if (!isFallback) {
+                setImgSrc(fallbackUrl);
+                setIsFallback(true);
+              }
+            }}
+            // Apply scale crop only if dropped back to the letterboxed hqdefault
+            className={`object-cover transition-transform duration-300 group-hover:scale-105 ${
+              isFallback ? "scale-[1.35] group-hover:scale-[1.42]" : ""
+            }`}
+          />
         </div>
 
         <h2 className="font-display text-2xl leading-snug text-paper">{track.title}</h2>

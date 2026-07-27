@@ -1,0 +1,9 @@
+{
+  "id": "test-demo",
+  "title": "Test Demo",
+  "artist": "Nobody",
+  "lines": [
+    { "id": "l1", "start": 0, "end": 3, "text": "今日はいい天気ですね" },
+    { "id": "l2", "start": 3, "end": 6, "text": "友達と公園へ行きます" }
+  ]
+}
