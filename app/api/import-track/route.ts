@@ -5,7 +5,9 @@ import * as wanakana from "wanakana";
 
 export const maxDuration = 60; // Allows execution time for Jisho lookups on longer songs
 
-interface Token {
+export type Level = "N5" | "N4" | "N3" | "N2" | "N1";
+
+export interface Token {
   surface: string;
   romaji: string;
   meaning: string;
@@ -13,42 +15,60 @@ interface Token {
   skip?: boolean;
 }
 
-interface LyricLine {
+export interface LyricLine {
   id: string;
   start: number;
   end: number;
   tokens: Token[];
 }
 
-interface Track {
+export interface Track {
   id: string;
   title: string;
+  titleRomaji: string;
   artist: string;
-  youtubeUrl?: string;
+  level: Level;
+  duration: string;
+  /** YouTube video id, e.g. the "v=" parameter */
+  youtubeId: string;
+  /** Accent color for the track's card and active-line marker */
+  accent: string;
+  summary: string;
   lyrics: LyricLine[];
-  isUserAdded: boolean;
 }
+
+// Default accent class for user-imported custom tracks
+const CUSTOM_ACCENT = "from-purple-500/20 to-purple-500/10";
 
 // In-memory singletons across requests
 let tokenizerInstance: kuromoji.Tokenizer<kuromoji.IpadicFeatures> | null = null;
 const meaningCache = new Map<string, string>();
-const JISHO_DELAY_MS = 150; // Throttle to stay within Jisho rate limits
+const JISHO_DELAY_MS = 200; // Throttle to stay within Jisho rate limits
 
 async function getTokenizer(): Promise<kuromoji.Tokenizer<kuromoji.IpadicFeatures>> {
   if (tokenizerInstance) return tokenizerInstance;
 
-  // Path to IPADIC dictionary in node_modules
+  // Point directly to kuromoji's dict inside node_modules
   const dictPath = path.join(process.cwd(), "node_modules", "kuromoji", "dict");
 
   return new Promise((resolve, reject) => {
     kuromoji.builder({ dicPath: dictPath }).build((err, tokenizer) => {
-      if (err) reject(err);
-      else {
+      if (err) {
+        console.error("Failed to load Kuromoji dict from:", dictPath, err);
+        reject(err);
+      } else {
         tokenizerInstance = tokenizer;
         resolve(tokenizer);
       }
     });
   });
+}
+
+/** Utility to extract an 11-character YouTube video ID from various URL formats */
+function extractYoutubeId(url?: string): string {
+  if (!url) return "";
+  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+  return match ? match[1] : "";
 }
 
 export async function POST(req: NextRequest) {
@@ -60,28 +80,43 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Both title and artist are required." }, { status: 400 });
     }
 
-    // 1. Fetch synced lyrics from LRCLIB
-    const lrclibUrl = `https://lrclib.net/api/get?track_name=${encodeURIComponent(
+    // Extract YouTube ID if a YouTube URL was provided
+    const youtubeId = extractYoutubeId(youtubeUrl);
+
+    // 1. Fetch synced lyrics from LRCLIB (with search fallback)
+    let lrcData = null;
+
+    const getUrl = `https://lrclib.net/api/get?track_name=${encodeURIComponent(
       title,
     )}&artist_name=${encodeURIComponent(artist)}`;
 
-    const lrcRes = await fetch(lrclibUrl, {
+    const getRes = await fetch(getUrl, {
       headers: { "User-Agent": "LingoTrack/1.0" },
     });
 
-    if (!lrcRes.ok) {
-      if (lrcRes.status === 404) {
-        return NextResponse.json({ error: "No synced lyrics found on LRCLIB for this track/artist." }, { status: 404 });
+    const getContentType = getRes.headers.get("content-type") || "";
+
+    if (getRes.ok && getContentType.includes("application/json")) {
+      lrcData = await getRes.json();
+    } else {
+      // Direct match failed — try searching LRCLIB
+      const searchUrl = `https://lrclib.net/api/search?q=${encodeURIComponent(`${title} ${artist}`)}`;
+      const searchRes = await fetch(searchUrl, {
+        headers: { "User-Agent": "LingoTrack/1.0" },
+      });
+
+      const searchContentType = searchRes.headers.get("content-type") || "";
+
+      if (searchRes.ok && searchContentType.includes("application/json")) {
+        const searchResults = await searchRes.json();
+        lrcData = searchResults.find((item: any) => item.syncedLyrics) || null;
       }
-      return NextResponse.json({ error: `LRCLIB request failed with status ${lrcRes.status}` }, { status: 502 });
     }
 
-    const lrcData = await lrcRes.json();
-
-    if (!lrcData.syncedLyrics) {
+    if (!lrcData || !lrcData.syncedLyrics) {
       return NextResponse.json(
-        { error: "LRCLIB has lyrics for this song, but no line-synced timestamps." },
-        { status: 422 },
+        { error: "No line-synced lyrics found on LRCLIB for this track/artist." },
+        { status: 404 },
       );
     }
 
@@ -109,15 +144,22 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // 5. Construct final track payload
+    // 5. Construct track payload matching Track interface signature
     const outputId = slugify(title);
+    const duration = formatDuration(lrcData.duration);
+    const trackName = lrcData.trackName || title;
+
     const track: Track = {
-      id: `custom-${outputId}-${Date.now()}`,
-      title: lrcData.trackName || title,
+      id: outputId,
+      title: trackName,
+      titleRomaji: wanakana.toRomaji(trackName) || trackName,
       artist: lrcData.artistName || artist,
-      youtubeUrl: youtubeUrl || undefined,
+      level: "N3",
+      duration: duration || "0:00",
+      youtubeId,
+      accent: CUSTOM_ACCENT,
+      summary: `Custom track with ${processedLines.length} tokenized lyric lines.`,
       lyrics: processedLines,
-      isUserAdded: true,
     };
 
     return NextResponse.json({ track }, { status: 200 });
@@ -215,8 +257,15 @@ async function lookupMeaning(word: string): Promise<string> {
 
   let meaning = "";
   try {
-    const res = await fetch(`https://jisho.org/api/v1/search/words?keyword=${encodeURIComponent(word)}`);
-    if (res.ok) {
+    const res = await fetch(`https://jisho.org/api/v1/search/words?keyword=${encodeURIComponent(word)}`, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)",
+      },
+    });
+
+    const contentType = res.headers.get("content-type") || "";
+
+    if (res.ok && contentType.includes("application/json")) {
       const data = await res.json();
       const senses = data?.data?.[0]?.senses;
       if (senses && senses.length > 0) {
@@ -233,7 +282,6 @@ async function lookupMeaning(word: string): Promise<string> {
 
   meaningCache.set(word, meaning);
 
-  // Rate-limit Jisho requests
   await new Promise((r) => setTimeout(r, JISHO_DELAY_MS));
 
   return meaning;
@@ -241,6 +289,13 @@ async function lookupMeaning(word: string): Promise<string> {
 
 function round2(n: number): number {
   return Math.round(n * 100) / 100;
+}
+
+function formatDuration(totalSeconds?: number): string {
+  if (!totalSeconds) return "0:00";
+  const m = Math.floor(totalSeconds / 60);
+  const s = Math.round(totalSeconds % 60);
+  return `${m}:${String(s).padStart(2, "0")}`;
 }
 
 function slugify(str: string): string {

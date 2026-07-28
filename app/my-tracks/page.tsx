@@ -1,40 +1,42 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
+import { useState, useEffect } from "react";
+import TrackCard from "@/components/TrackCard";
+import type { Track } from "@/lib/types";
 
-interface Token {
-  surface: string;
-  romaji: string;
-  meaning: string;
-  pos?: string;
-  skip?: boolean;
-}
-
-interface LyricLine {
-  id: string;
-  start: number;
-  end: number;
-  tokens: Token[];
-}
-
-interface Track {
-  id: string;
-  title: string;
-  artist: string;
-  youtubeUrl?: string;
-  lyrics: LyricLine[];
-  isUserAdded?: boolean;
-}
+const STORAGE_KEY = "lingotrack_custom_tracks";
 
 export default function MyTracksPage() {
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
+  const [youtubeUrl, setYoutubeUrl] = useState("");
 
   const [loading, setLoading] = useState(false);
   const [statusText, setStatusText] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [tracks, setTracks] = useState<Track[]>([]);
+
+  // Load custom tracks from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        setTracks(JSON.parse(saved));
+      }
+    } catch (err) {
+      console.error("Failed to load tracks from localStorage", err);
+    }
+  }, []);
+
+  // Sync tracks state to localStorage whenever tracks change
+  const saveTracksToStorage = (updatedTracks: Track[]) => {
+    setTracks(updatedTracks);
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedTracks));
+    } catch (err) {
+      console.error("Failed to save tracks to localStorage", err);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,7 +46,6 @@ export default function MyTracksPage() {
     setError(null);
     setStatusText("Searching LRCLIB for synced lyrics...");
 
-    // Update status text progressively to give feedback on long tasks
     const statusTimer = setTimeout(() => {
       setStatusText("Tokenizing Japanese text & fetching word definitions...");
     }, 2500);
@@ -53,7 +54,11 @@ export default function MyTracksPage() {
       const res = await fetch("/api/import-track", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: title.trim(), artist: artist.trim() }),
+        body: JSON.stringify({
+          title: title.trim(),
+          artist: artist.trim(),
+          youtubeUrl: youtubeUrl.trim(),
+        }),
       });
 
       const contentType = res.headers.get("content-type") || "";
@@ -68,11 +73,14 @@ export default function MyTracksPage() {
         throw new Error(data.error || "Failed to import track.");
       }
 
-      setTracks((prev) => [data.track, ...prev]);
+      // Add new track and persist to localStorage
+      const updated = [data.track as Track, ...tracks];
+      saveTracksToStorage(updated);
 
-      // Reset form fields on success
+      // Reset form fields
       setTitle("");
       setArtist("");
+      setYoutubeUrl("");
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
@@ -100,14 +108,15 @@ export default function MyTracksPage() {
           <div>
             <h1 className="font-display text-4xl leading-tight text-paper sm:text-5xl">My Tracks</h1>
             <p className="mt-2 max-w-xl font-body text-sm leading-relaxed text-paper/60 sm:text-base">
-              Add custom Japanese tracks by title and artist to parse synced lyrics, romaji, and word definitions.
+              Add custom Japanese tracks by title, artist, and YouTube link to parse synced lyrics, romaji, and word
+              definitions.
             </p>
           </div>
         </div>
       </header>
 
       {/* Add Track Form Panel */}
-      <div className="mb-12 rounded-xl border border-paper/10 bg-paper/5 p-6 sm:p-8 shadow-tag">
+      <div className="mb-12 rounded-xl border border-paper/10 bg-paper/5 p-6 shadow-tag sm:p-8">
         <h2 className="font-display text-xl font-bold text-paper mb-4">Add a New Track</h2>
 
         {/* Error Alert Box */}
@@ -130,7 +139,7 @@ export default function MyTracksPage() {
 
         {/* Form Inputs */}
         <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <div>
               <label className="block font-mono text-[11px] uppercase tracking-wider text-paper/60 mb-1.5">
                 Song Title <span className="text-gold">*</span>
@@ -160,6 +169,20 @@ export default function MyTracksPage() {
                 className="w-full rounded-lg border border-paper/10 bg-paper/5 px-4 py-2.5 font-body text-sm text-paper placeholder-paper/30 outline-none transition focus:border-gold/50 focus:ring-1 focus:ring-gold/50 disabled:opacity-50"
               />
             </div>
+          </div>
+
+          <div>
+            <label className="block font-mono text-[11px] uppercase tracking-wider text-paper/60 mb-1.5">
+              YouTube URL <span className="text-paper/40">(Optional)</span>
+            </label>
+            <input
+              type="url"
+              placeholder="e.g. https://www.youtube.com/watch?v=..."
+              value={youtubeUrl}
+              onChange={(e) => setYoutubeUrl(e.target.value)}
+              disabled={loading}
+              className="w-full rounded-lg border border-paper/10 bg-paper/5 px-4 py-2.5 font-body text-sm text-paper placeholder-paper/30 outline-none transition focus:border-gold/50 focus:ring-1 focus:ring-gold/50 disabled:opacity-50"
+            />
           </div>
 
           {/* Progress Indicator Banner when loading */}
@@ -212,32 +235,10 @@ export default function MyTracksPage() {
             </p>
           </div>
         ) : (
-          /* Track List Grid */
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {tracks.map((track) => (
-              <div
-                key={track.id}
-                className="group relative flex flex-col justify-between rounded-lg border border-paper/10 bg-paper/5 p-5 shadow-tag transition hover:border-gold/40"
-              >
-                <div>
-                  <div className="flex items-start justify-between gap-3">
-                    <h3 className="font-display text-xl font-bold text-paper group-hover:text-gold transition">
-                      {track.title}
-                    </h3>
-                    <span className="rounded border border-gold/20 bg-gold/10 px-2 py-0.5 font-mono text-[10px] text-gold uppercase tracking-wider shrink-0">
-                      {track.lyrics.length} lines
-                    </span>
-                  </div>
-                  <p className="mt-1 font-mono text-xs text-paper/60">{track.artist}</p>
-                </div>
-
-                <div className="mt-6 flex items-center justify-between border-t border-paper/10 pt-3 font-mono text-[10px] text-paper/40">
-                  <span>Custom Import</span>
-                  <Link href={`/track/${track.id}`} className="text-gold hover:underline font-semibold">
-                    Open Player →
-                  </Link>
-                </div>
-              </div>
+          /* Track Grid using TrackCard */
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {tracks.map((track, i) => (
+              <TrackCard key={track.id} track={track} index={i} />
             ))}
           </div>
         )}
