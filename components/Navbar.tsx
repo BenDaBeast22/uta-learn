@@ -15,7 +15,7 @@ export default function Navbar({ userEmail }: NavbarProps) {
   const navLinks = [
     { name: "Curated Tracks", href: "/" },
     { name: "My Tracks", href: "/my-tracks" },
-    { name: "My Vocab", href: "/vocab" },
+    { name: "My Vocab", href: "/my-vocab" },
   ];
 
   return (

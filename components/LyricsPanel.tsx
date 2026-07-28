@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { LyricLine, LyricDisplayMode } from "@/lib/types";
+import { LyricLine as LyricLineType, LyricDisplayMode } from "@/lib/types";
 import { useLyricSync } from "@/lib/useLyricSync";
 import WordToken from "./WordToken";
+import LyricLine from "./LyricLine";
 
 interface LyricsPanelProps {
-  lyrics: LyricLine[];
+  songTitle: string;
+  lyrics: LyricLineType[];
   currentTime: number;
   accent: string;
   displayMode?: LyricDisplayMode;
@@ -14,6 +16,7 @@ interface LyricsPanelProps {
 }
 
 export default function LyricsPanel({
+  songTitle,
   lyrics,
   currentTime,
   accent,
@@ -71,20 +74,7 @@ export default function LyricsPanel({
               />
             )}
             <div className="relative pl-3">
-              <div
-                className={`text-lg leading-relaxed text-paper sm:text-xl ${
-                  displayMode === "romaji" ? "font-mono tracking-normal" : "font-display tracking-wide"
-                }`}
-              >
-                {line.tokens.map((token, ti) => (
-                  <WordToken
-                    key={ti}
-                    token={token}
-                    active={isActive && ti === activeWordIndex}
-                    displayMode={displayMode}
-                  />
-                ))}
-              </div>
+              <LyricLine tokens={line.tokens} songTitle={songTitle} displayMode={displayMode} />
               {isActive && (
                 <div className="mt-1.5 h-px w-full bg-paper/10">
                   <div

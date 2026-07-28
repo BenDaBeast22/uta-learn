@@ -17,7 +17,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang="en">
-      <body className=" text-paper antialiased">
+      <body className=" min-h-screen bg-ink text-paper antialiased">
         <Navbar userEmail={user?.email ?? null} />
         {children}
       </body>

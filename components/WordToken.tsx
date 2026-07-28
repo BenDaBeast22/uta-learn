@@ -3,6 +3,7 @@
 import { useRef, useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { WordToken as WordTokenData, LyricDisplayMode } from "@/lib/types";
+import { useVocabStore } from "@/hooks/useVocabStore";
 
 const POPOVER_WIDTH = 208;
 const POPOVER_EST_HEIGHT = 160;
@@ -10,18 +11,18 @@ const VIEWPORT_MARGIN = 8;
 
 interface WordTokenProps {
   token: WordTokenData;
+  songTitle?: string;
+  contextSentence?: string;
   active?: boolean;
   displayMode?: LyricDisplayMode;
-  onSaveVocab?: (token: WordTokenData) => void;
-  isSaved?: boolean;
 }
 
 export default function WordToken({
   token,
+  songTitle,
+  contextSentence,
   active = false,
   displayMode = "kanji",
-  onSaveVocab,
-  isSaved = false,
 }: WordTokenProps) {
   const [open, setOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -30,6 +31,10 @@ export default function WordToken({
 
   const triggerRef = useRef<HTMLSpanElement>(null);
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Hook for adding/removing vocabulary and checking saved state
+  const { addVocab, removeVocab, isSaved } = useVocabStore();
+  const saved = isSaved(token);
 
   useEffect(() => {
     return () => {
@@ -90,6 +95,16 @@ export default function WordToken({
       setOpen(false);
     }, 120);
   }
+
+  const handleToggleSave = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (saved) {
+      const id = `${token.surface}_${token.romaji || ""}`;
+      removeVocab(id);
+    } else {
+      addVocab(token, songTitle, contextSentence);
+    }
+  };
 
   const renderInlineContent = () => {
     if (displayMode === "romaji") {
@@ -178,15 +193,12 @@ export default function WordToken({
               <div className="mt-2.5 border-t border-ink/10 pt-2">
                 <button
                   type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onSaveVocab?.(token);
-                  }}
+                  onClick={handleToggleSave}
                   className={`flex w-full items-center justify-center gap-1.5 rounded-md px-2 py-1 font-mono text-[0.7rem] font-medium transition ${
-                    isSaved ? "bg-seal/10 text-seal cursor-default" : "bg-ink text-paper hover:bg-gold hover:text-ink"
+                    saved ? "bg-seal/10 text-seal hover:bg-seal/20" : "bg-ink text-paper hover:bg-gold hover:text-ink"
                   }`}
                 >
-                  {isSaved ? "✓ Saved to Vocab" : "+ Add to Vocab"}
+                  {saved ? "✓ Saved in Vocab" : "+ Add to Vocab"}
                 </button>
               </div>
 

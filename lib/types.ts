@@ -43,3 +43,12 @@ export interface Track {
   summary: string;
   lyrics: LyricLine[];
 }
+
+export interface SavedVocabItem {
+  id: string; // Unique identifier (e.g., token surface + reading or timestamp)
+  token: WordToken;
+  songTitle?: string;
+  artist?: string;
+  contextSentence?: string; // The full lyric line where the word was found
+  savedAt: number; // Date timestamp
+}

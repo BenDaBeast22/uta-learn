@@ -70,6 +70,7 @@ export default function TrackPlayer({ track }: { track: Track }) {
 
       {/* Lyrics Panel */}
       <LyricsPanel
+        songTitle={track.title}
         lyrics={track.lyrics}
         currentTime={currentTime}
         accent={track.accent}
