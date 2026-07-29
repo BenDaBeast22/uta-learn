@@ -23,6 +23,7 @@ export default function LyricLine({ tokens, songTitle, displayMode }: LyricLineP
           token={token}
           songTitle={songTitle}
           contextSentence={fullSentence}
+          displayMode={displayMode}
         />
       ))}
     </div>
