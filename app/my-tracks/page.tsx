@@ -38,6 +38,14 @@ export default function MyTracksPage() {
     }
   };
 
+  // Delete handler strictly for custom imported tracks
+  const handleDeleteTrack = (trackId: string, trackTitle: string) => {
+    if (confirm(`Are you sure you want to delete "${trackTitle}"?`)) {
+      const updated = tracks.filter((t) => t.id !== trackId);
+      saveTracksToStorage(updated);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !artist.trim()) return;
@@ -73,8 +81,11 @@ export default function MyTracksPage() {
         throw new Error(data.error || "Failed to import track.");
       }
 
+      // Explicitly flag imported tracks as custom
+      const newTrack: Track = { ...data.track, isCustom: true };
+
       // Add new track and persist to localStorage
-      const updated = [data.track as Track, ...tracks];
+      const updated = [newTrack, ...tracks];
       saveTracksToStorage(updated);
 
       // Reset form fields
@@ -238,7 +249,7 @@ export default function MyTracksPage() {
           /* Track Grid using TrackCard */
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {tracks.map((track, i) => (
-              <TrackCard key={track.id} track={track} index={i} />
+              <TrackCard key={track.id} track={track} index={i} onDelete={handleDeleteTrack} />
             ))}
           </div>
         )}

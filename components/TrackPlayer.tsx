@@ -34,7 +34,7 @@ export default function TrackPlayer({ track }: { track: Track }) {
         {/* Display Mode Toggle */}
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-paper/10 bg-paper/5 p-3">
           <span className="font-mono text-xs text-paper/70">Lyric View:</span>
-          <div className="flex gap-1 rounded-full bg-black/30 p-1 border border-paper/10">
+          <div className="flex flex-wrap gap-1 rounded-full bg-black/30 p-1 border border-paper/10">
             <button
               onClick={() => setDisplayMode("kanji")}
               className={`rounded-full px-3 py-1 font-mono text-xs transition ${
@@ -58,6 +58,14 @@ export default function TrackPlayer({ track }: { track: Track }) {
               }`}
             >
               Furigana
+            </button>
+            <button
+              onClick={() => setDisplayMode("english")}
+              className={`rounded-full px-3 py-1 font-mono text-xs transition ${
+                displayMode === "english" ? "bg-gold text-black font-semibold" : "text-paper/60 hover:text-paper"
+              }`}
+            >
+              English Subtitles
             </button>
           </div>
         </div>

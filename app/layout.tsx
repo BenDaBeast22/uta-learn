@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   title: "Uta Learn — Learn Japanese through song",
   description:
     "Learn Japanese through songs. Follow synced lyrics as you listen, and hover any word for its romaji and meaning.",
+  other: {
+    google: "notranslate",
+  },
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

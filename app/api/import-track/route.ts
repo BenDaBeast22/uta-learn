@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Track, LyricLine, WordToken } from "@/lib/types";
 import path from "node:path";
 import kuromoji from "kuromoji";
 import * as wanakana from "wanakana";
@@ -7,38 +8,8 @@ export const maxDuration = 60; // Allows execution time for Jisho lookups on lon
 
 export type Level = "N5" | "N4" | "N3" | "N2" | "N1";
 
-export interface Token {
-  surface: string;
-  romaji: string;
-  meaning: string;
-  pos?: string;
-  skip?: boolean;
-}
-
-export interface LyricLine {
-  id: string;
-  start: number;
-  end: number;
-  tokens: Token[];
-}
-
-export interface Track {
-  id: string;
-  title: string;
-  titleRomaji: string;
-  artist: string;
-  level: Level;
-  duration: string;
-  /** YouTube video id, e.g. the "v=" parameter */
-  youtubeId: string;
-  /** Accent color for the track's card and active-line marker */
-  accent: string;
-  summary: string;
-  lyrics: LyricLine[];
-}
-
 // Default accent class for user-imported custom tracks
-const CUSTOM_ACCENT = "from-purple-500/20 to-purple-500/10";
+const CUSTOM_ACCENT = "#8C86C9"; // or whatever accent hex color you prefer
 
 // In-memory singletons across requests
 let tokenizerInstance: kuromoji.Tokenizer<kuromoji.IpadicFeatures> | null = null;
@@ -71,6 +42,61 @@ function extractYoutubeId(url?: string): string {
   return match ? match[1] : "";
 }
 
+/** Fetches duration in seconds for a given YouTube video ID via oEmbed page scraping/oembed fallback */
+async function getYoutubeDurationSeconds(youtubeId: string): Promise<number | null> {
+  if (!youtubeId) return null;
+
+  try {
+    const videoUrl = `https://www.youtube.com/watch?v=${youtubeId}`;
+    const res = await fetch(videoUrl, {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      },
+    });
+
+    if (!res.ok) return null;
+    const html = await res.text();
+
+    // Extracts lengthSeconds from YouTube initial player response config
+    const match = html.match(/"lengthSeconds":"(\d+)"/);
+    if (match && match[1]) {
+      return parseInt(match[1], 10);
+    }
+  } catch (err) {
+    console.warn("Could not fetch YouTube duration:", err);
+  }
+
+  return null;
+}
+
+/** Translates an array of Japanese lyric lines into English using Google Translate GTX */
+async function batchTranslateLines(lines: string[]): Promise<string[]> {
+  if (lines.length === 0) return [];
+
+  try {
+    const joinedText = lines.join("\n");
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=ja&tl=en&dt=t&q=${encodeURIComponent(
+      joinedText,
+    )}`;
+
+    const res = await fetch(url);
+    if (!res.ok) return [];
+
+    const data = await res.json();
+    if (!data || !data[0]) return [];
+
+    // Reconstruct full text response from Google chunk segments
+    const translatedText = data[0].map((chunk: any) => chunk[0] || "").join("");
+    const translatedLines = translatedText.split("\n");
+
+    return translatedLines;
+  } catch (err) {
+    console.error("Failed to batch translate lines:", err);
+    return [];
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -83,12 +109,19 @@ export async function POST(req: NextRequest) {
     // Extract YouTube ID if a YouTube URL was provided
     const youtubeId = extractYoutubeId(youtubeUrl);
 
-    // 1. Fetch synced lyrics from LRCLIB (with search fallback)
+    // Fetch video duration directly from YouTube if video ID exists
+    const ytDurationSeconds = await getYoutubeDurationSeconds(youtubeId);
+
+    // 1. Fetch synced lyrics from LRCLIB (passing duration parameter if fetched from YouTube)
     let lrcData = null;
 
-    const getUrl = `https://lrclib.net/api/get?track_name=${encodeURIComponent(
+    let getUrl = `https://lrclib.net/api/get?track_name=${encodeURIComponent(
       title,
     )}&artist_name=${encodeURIComponent(artist)}`;
+
+    if (ytDurationSeconds) {
+      getUrl += `&duration=${ytDurationSeconds}`;
+    }
 
     const getRes = await fetch(getUrl, {
       headers: { "User-Agent": "LingoTrack/1.0" },
@@ -108,8 +141,21 @@ export async function POST(req: NextRequest) {
       const searchContentType = searchRes.headers.get("content-type") || "";
 
       if (searchRes.ok && searchContentType.includes("application/json")) {
-        const searchResults = await searchRes.json();
-        lrcData = searchResults.find((item: any) => item.syncedLyrics) || null;
+        const searchResults: any[] = await searchRes.json();
+
+        // If we have a YouTube duration, find the result with the closest duration
+        if (ytDurationSeconds && searchResults.length > 0) {
+          const syncedWithDuration = searchResults
+            .filter((item: any) => item.syncedLyrics && item.duration)
+            .sort((a, b) => Math.abs(a.duration - ytDurationSeconds) - Math.abs(b.duration - ytDurationSeconds));
+
+          lrcData = syncedWithDuration[0] || null;
+        }
+
+        // Fallback to first synced result
+        if (!lrcData) {
+          lrcData = searchResults.find((item: any) => item.syncedLyrics) || null;
+        }
       }
     }
 
@@ -126,10 +172,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Failed to parse line timestamps from lyrics." }, { status: 422 });
     }
 
-    // 3. Load Kuromoji Tokenizer
+    // 3. Batch translate raw Japanese sentences
+    const plainSentences = rawLines.map((line) => line.text);
+    const translations = await batchTranslateLines(plainSentences);
+
+    // 4. Load Kuromoji Tokenizer
     const tokenizer = await getTokenizer();
 
-    // 4. Tokenize, Romanize & Gloss each line
+    // 5. Tokenize, Romanize, Gloss & attach translation for each line
     const processedLines: LyricLine[] = [];
 
     for (let i = 0; i < rawLines.length; i++) {
@@ -141,12 +191,14 @@ export async function POST(req: NextRequest) {
         start: line.start,
         end: line.end,
         tokens,
+        translation: translations[i] || "",
       });
     }
 
-    // 5. Construct track payload matching Track interface signature
+    // 6. Construct track payload matching Track interface signature
     const outputId = slugify(title);
-    const duration = formatDuration(lrcData.duration);
+    const finalDurationSeconds = ytDurationSeconds || lrcData.duration;
+    const duration = formatDuration(finalDurationSeconds);
     const trackName = lrcData.trackName || title;
 
     const track: Track = {
@@ -160,6 +212,7 @@ export async function POST(req: NextRequest) {
       accent: CUSTOM_ACCENT,
       summary: `Custom track with ${processedLines.length} tokenized lyric lines.`,
       lyrics: processedLines,
+      isCustom: true,
     };
 
     return NextResponse.json({ track }, { status: 200 });
@@ -194,9 +247,12 @@ function parseLrc(lrcText: string): Array<{ start: number; end: number; text: st
 }
 
 /** Tokenizes a single line of Japanese text */
-async function tokenizeLine(tokenizer: kuromoji.Tokenizer<kuromoji.IpadicFeatures>, text: string): Promise<Token[]> {
+async function tokenizeLine(
+  tokenizer: kuromoji.Tokenizer<kuromoji.IpadicFeatures>,
+  text: string,
+): Promise<WordToken[]> {
   const kuromojiTokens = tokenizer.tokenize(text);
-  const tokens: Token[] = [];
+  const tokens: WordToken[] = [];
 
   for (const t of kuromojiTokens) {
     const isSymbol = t.pos === "記号";

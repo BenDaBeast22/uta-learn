@@ -27,6 +27,7 @@ export interface LyricLine {
   /** Line end time in seconds */
   end: number;
   tokens: WordToken[];
+  translation?: string; // english translation
 }
 
 export interface Track {
@@ -42,6 +43,7 @@ export interface Track {
   accent: string;
   summary: string;
   lyrics: LyricLine[];
+  isCustom?: boolean;
 }
 
 export interface SavedVocabItem {
@@ -52,3 +54,5 @@ export interface SavedVocabItem {
   contextSentence?: string; // The full lyric line where the word was found
   savedAt: number; // Date timestamp
 }
+
+export type LyricDisplayMode = "kanji" | "romaji" | "dual" | "english";

@@ -74,7 +74,12 @@ export default function LyricsPanel({
               />
             )}
             <div className="relative pl-3">
-              <LyricLine tokens={line.tokens} songTitle={songTitle} displayMode={displayMode} />
+              <LyricLine
+                tokens={line.tokens}
+                songTitle={songTitle}
+                displayMode={displayMode}
+                translation={line.translation}
+              />
               {isActive && (
                 <div className="mt-1.5 h-px w-full bg-paper/10">
                   <div
