@@ -16,6 +16,11 @@ let tokenizerInstance: kuromoji.Tokenizer<kuromoji.IpadicFeatures> | null = null
 const meaningCache = new Map<string, string>();
 const JISHO_DELAY_MS = 200; // Throttle to stay within Jisho rate limits
 
+// Helper: Check if string contains any Japanese characters (Kanji, Hiragana, Katakana)
+function isJapaneseText(text: string): boolean {
+  return /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/u.test(text);
+}
+
 async function getTokenizer(): Promise<kuromoji.Tokenizer<kuromoji.IpadicFeatures>> {
   if (tokenizerInstance) return tokenizerInstance;
 
@@ -206,7 +211,7 @@ export async function POST(req: NextRequest) {
       title: trackName,
       titleRomaji: wanakana.toRomaji(trackName) || trackName,
       artist: lrcData.artistName || artist,
-      level: "N3",
+      level: "",
       duration: duration || "0:00",
       youtubeId,
       accent: CUSTOM_ACCENT,
@@ -255,10 +260,17 @@ async function tokenizeLine(
   const tokens: WordToken[] = [];
 
   for (const t of kuromojiTokens) {
-    const isSymbol = t.pos === "記号";
+    const isJp = isJapaneseText(t.surface_form);
 
-    if (isSymbol) {
-      tokens.push({ surface: t.surface_form, romaji: "", meaning: "", skip: true });
+    // Skip dictionary lookup and interactive UI state for punctuation OR non-Japanese text
+    if (t.pos === "記号" || !isJp) {
+      tokens.push({
+        surface: t.surface_form,
+        romaji: wanakana.toRomaji(t.surface_form),
+        meaning: "",
+        pos: mapPos(t.pos, t.pos_detail_1),
+        skip: true,
+      });
       continue;
     }
 

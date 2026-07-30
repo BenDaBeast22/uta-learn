@@ -7,6 +7,11 @@ import * as wanakana from "wanakana";
 const JISHO_DELAY_MS = 200;
 const meaningCache = new Map();
 
+// Helper: Check if string contains any Japanese characters (Kanji, Hiragana, Katakana)
+function isJapaneseText(text) {
+  return /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/u.test(text);
+}
+
 // Helper: Convert MM:SS or M:SS string into total seconds
 function parseDurationToSeconds(durationStr) {
   if (!durationStr) return null;
@@ -195,23 +200,31 @@ async function tokenizeLine(tokenizer, text) {
   const tokens = [];
 
   for (const t of kuromojiTokens) {
+    const isJp = isJapaneseText(t.surface_form);
+
+    // Skip dictionary lookups for punctuation OR non-Japanese text (English, numbers, etc.)
+    if (t.pos === "記号" || !isJp) {
+      tokens.push({
+        surface: t.surface_form,
+        romaji: wanakana.toRomaji(t.surface_form),
+        meaning: "",
+        pos: mapPos(t.pos, t.pos_detail_1),
+        skip: true,
+      });
+      continue;
+    }
+
     const reading = t.reading && t.reading !== "*" ? t.reading : t.surface_form;
     const romaji = wanakana.toRomaji(reading);
     const lookupWord = t.basic_form && t.basic_form !== "*" ? t.basic_form : t.surface_form;
     const meaning = await lookupMeaning(lookupWord);
 
-    const tokenObj = {
-      surface: t.surface_form, // Japanese characters preserved
+    tokens.push({
+      surface: t.surface_form,
       romaji,
       meaning,
       pos: mapPos(t.pos, t.pos_detail_1),
-    };
-
-    if (t.pos === "記号") {
-      tokenObj.skip = true;
-    }
-
-    tokens.push(tokenObj);
+    });
   }
 
   return tokens;

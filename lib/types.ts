@@ -1,4 +1,4 @@
-export type Level = "Beginner" | "Intermediate" | "Advanced";
+export type Level = "Beginner" | "Intermediate" | "Advanced" | "";
 
 export interface WordToken {
   /** The word exactly as it appears in the lyric line (kanji/kana/punctuation) */

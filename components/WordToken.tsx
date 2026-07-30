@@ -9,6 +9,12 @@ const POPOVER_WIDTH = 208;
 const POPOVER_EST_HEIGHT = 160;
 const VIEWPORT_MARGIN = 8;
 
+// Helper: Check if string contains any Japanese characters (Kanji, Hiragana, Katakana)
+export function isJapaneseText(text?: string): boolean {
+  if (!text) return false;
+  return /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/u.test(text);
+}
+
 interface WordTokenProps {
   token: WordTokenData;
   songTitle?: string;
@@ -44,7 +50,9 @@ export default function WordToken({
     };
   }, []);
 
-  if (token.skip) {
+  // Guard: Skip popover interactive state for marked tokens OR non-Japanese text (English, numbers, symbols)
+  const isJp = isJapaneseText(token.surface);
+  if (token.skip || !isJp) {
     return <span>{displayMode === "romaji" ? token.romaji || token.surface : token.surface}</span>;
   }
 
