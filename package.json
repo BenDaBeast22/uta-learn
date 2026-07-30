@@ -9,7 +9,8 @@
     "lint": "next lint",
     "fetch-lyrics": "node scripts/fetch-lyrics.mjs",
     "tokenize-lyrics": "node scripts/tokenize-lyrics.mjs",
-    "import-lyrics": "node scripts/import-lyrics.mjs"
+    "import-lyrics": "node scripts/import-lyrics.mjs",
+    "generate-lyrics": "node scripts/generate-lyrics.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.3",

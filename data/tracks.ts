@@ -5,6 +5,8 @@ import { idolLyrics } from "./imports/idol.lyrics.generated";
 import { irisOutLyrics } from "./imports/iris-out.lyrics.generated";
 import { groovinMagicLyrics } from "./imports/groovin-magic.lyrics.generated";
 import { pipoPipoLyrics } from "./imports/pipo-pipo.lyrics.generated";
+import { somedayLyrics } from "./imports/someday.lyrics.generated";
+import { colorsLyrics } from "./imports/colors.lyrics.generated";
 
 const accentColors = {
   beginner: "#6F9E8C",
@@ -111,6 +113,18 @@ export const tracks: Track[] = [
     accent: "#B23A32",
     summary: "Pipo Pipoooo!!!",
     lyrics: pipoPipoLyrics,
+  },
+  {
+    id: "colors",
+    title: "Colors",
+    titleRomaji: "Colors",
+    artist: "Flow",
+    level: "Intermediate",
+    duration: "3:38",
+    youtubeId: "OLVyJl87_CI",
+    accent: accentColors.intermediate,
+    summary: "Jibun Wooooo!!!",
+    lyrics: colorsLyrics,
   },
 ];
 
