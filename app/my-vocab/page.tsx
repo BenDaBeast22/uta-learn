@@ -17,13 +17,77 @@ export default function MyVocabPage() {
     );
   });
 
-  if (!isLoaded) {
-    return (
-      <main className="mx-auto max-w-5xl px-6 py-12 text-center font-mono text-sm text-paper/50">
-        Loading your vocabulary deck...
-      </main>
-    );
-  }
+  const handleExportAnki = () => {
+    if (vocab.length === 0) return;
+
+    const escapeCsv = (str?: string) => {
+      if (!str) return "";
+      return str.replace(/"/g, '""');
+    };
+
+    const rows = vocab.map((item) => {
+      // Column 1 (Front): Japanese Word
+      const front = `"${escapeCsv(item.token.surface)}"`;
+
+      // Column 2 (Back): Styled HTML structure for clean rendering
+      let backHtmlParts: string[] = [];
+
+      // Romaji / Reading
+      if (item.token.romaji) {
+        backHtmlParts.push(
+          `<div style="font-size: 1.2em; color: #d97706; font-weight: 600; font-family: monospace;">${item.token.romaji}</div>`,
+        );
+      }
+
+      // Meaning / Definition
+      if (item.token.meaning) {
+        backHtmlParts.push(
+          `<div style="margin-top: 6px; font-size: 1.1em; line-height: 1.4;">${item.token.meaning}</div>`,
+        );
+      }
+
+      // Part of Speech Tag
+      if (item.token.pos) {
+        backHtmlParts.push(
+          `<div style="margin-top: 6px; display: inline-block; padding: 2px 6px; font-size: 0.7em; text-transform: uppercase; border: 1px solid #ccc; border-radius: 4px; opacity: 0.6;">${item.token.pos}</div>`,
+        );
+      }
+
+      // Context Sentence
+      if (item.contextSentence) {
+        backHtmlParts.push(`<hr style="margin: 12px 0 8px 0; border: none; border-top: 1px solid #eee;" />`);
+        backHtmlParts.push(
+          `<div style="font-style: italic; font-size: 0.9em; opacity: 0.8; line-height: 1.4;">"${item.contextSentence}"</div>`,
+        );
+      }
+
+      // Song Source
+      if (item.songTitle) {
+        backHtmlParts.push(
+          `<div style="margin-top: 4px; font-size: 0.75em; opacity: 0.5;">🎵 From: ${item.songTitle}</div>`,
+        );
+      }
+
+      const back = `"${escapeCsv(backHtmlParts.join(""))}"`;
+
+      return `${front},${back}`;
+    });
+
+    // 1. Directives to auto-detect commas & enable HTML in Anki
+    // 2. UTF-8 BOM (\uFEFF) for correct character encoding
+    const headerDirectives = "#separator:Comma\n#html:true\n";
+    const csvContent = "\uFEFF" + headerDirectives + rows.join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "lingotrack-anki-vocab.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <main className="mx-auto max-w-5xl px-6 py-12 sm:py-16">
@@ -46,7 +110,7 @@ export default function MyVocabPage() {
           {vocab.length > 0 && (
             <button
               type="button"
-              onClick={() => alert("Anki export feature coming up next!")}
+              onClick={handleExportAnki}
               className="inline-flex items-center justify-center rounded-lg border border-gold/30 bg-gold/10 px-4 py-2.5 font-mono text-xs font-semibold text-gold transition hover:border-gold hover:bg-gold hover:text-ink"
             >
               Export to Anki (.csv)
