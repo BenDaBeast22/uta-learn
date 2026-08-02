@@ -36,28 +36,12 @@ export default function TrackPlayer({ track }: { track: Track }) {
           <span className="font-mono text-xs text-paper/70">Lyric View:</span>
           <div className="flex flex-wrap gap-1 rounded-full bg-black/30 p-1 border border-paper/10">
             <button
-              onClick={() => setDisplayMode("kanji")}
-              className={`rounded-full px-3 py-1 font-mono text-xs transition ${
-                displayMode === "kanji" ? "bg-gold text-black font-semibold" : "text-paper/60 hover:text-paper"
-              }`}
-            >
-              Japanese
-            </button>
-            <button
-              onClick={() => setDisplayMode("romaji")}
-              className={`rounded-full px-3 py-1 font-mono text-xs transition ${
-                displayMode === "romaji" ? "bg-gold text-black font-semibold" : "text-paper/60 hover:text-paper"
-              }`}
-            >
-              Sing-Along (Romaji)
-            </button>
-            <button
               onClick={() => setDisplayMode("dual")}
               className={`rounded-full px-3 py-1 font-mono text-xs transition ${
                 displayMode === "dual" ? "bg-gold text-black font-semibold" : "text-paper/60 hover:text-paper"
               }`}
             >
-              Furigana
+              Readings
             </button>
             <button
               onClick={() => setDisplayMode("english")}
@@ -65,7 +49,23 @@ export default function TrackPlayer({ track }: { track: Track }) {
                 displayMode === "english" ? "bg-gold text-black font-semibold" : "text-paper/60 hover:text-paper"
               }`}
             >
-              English Subtitles
+              English Subs
+            </button>
+            <button
+              onClick={() => setDisplayMode("romaji")}
+              className={`rounded-full px-3 py-1 font-mono text-xs transition ${
+                displayMode === "romaji" ? "bg-gold text-black font-semibold" : "text-paper/60 hover:text-paper"
+              }`}
+            >
+              Romaji
+            </button>
+            <button
+              onClick={() => setDisplayMode("kanji")}
+              className={`rounded-full px-3 py-1 font-mono text-xs transition ${
+                displayMode === "kanji" ? "bg-gold text-black font-semibold" : "text-paper/60 hover:text-paper"
+              }`}
+            >
+              Japanese
             </button>
           </div>
         </div>

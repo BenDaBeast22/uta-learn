@@ -1171,7 +1171,7 @@ export const newGenesisLyrics: LyricLine[] = [
     "text": "New world",
     "tokens": [
       {
-        "surface": "new",
+        "surface": "New",
         "romaji": "new",
         "meaning": "",
         "pos": "noun",
@@ -2585,7 +2585,7 @@ export const newGenesisLyrics: LyricLine[] = [
     "text": "New world",
     "tokens": [
       {
-        "surface": "new",
+        "surface": "New",
         "romaji": "new",
         "meaning": "",
         "pos": "noun",

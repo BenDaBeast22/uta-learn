@@ -69,10 +69,13 @@ function isJapaneseText(text) {
   return /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/u.test(text);
 }
 
-// Helper: Capitalize first letter of translation line
-function capitalizeFirstLetter(text) {
-  if (!text) return "";
-  return text.charAt(0).toUpperCase() + text.slice(1);
+// Helper: Capitalize first word of a sentence or text string ("new world" -> "New world")
+function capitalizeFirstWord(text) {
+  if (!text || typeof text !== "string") return "";
+  const trimmed = text.trim();
+  if (!trimmed) return "";
+
+  return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
 }
 
 // Helper: Convert MM:SS or M:SS string into total seconds
@@ -421,13 +424,23 @@ async function main() {
   console.log("📖 Tokenizing lyrics into memory...");
   const tokenizedLines = rawLines.map((line) => {
     const kuromojiTokens = tokenizer.tokenize(line.text);
+    let hasSeenFirstNonJpWord = false;
 
     const mapped = kuromojiTokens.map((t) => {
       const isJp = isJapaneseText(t.surface_form);
 
       if (t.pos === "記号" || !isJp) {
+        let formattedSurface = t.surface_form;
+        const trimmed = t.surface_form.trim();
+
+        // Capitalize ONLY the first non-Japanese token word in the line ("new" -> "New")
+        if (!hasSeenFirstNonJpWord && trimmed.length > 0) {
+          formattedSurface = capitalizeFirstWord(t.surface_form);
+          hasSeenFirstNonJpWord = true;
+        }
+
         return {
-          surface: t.surface_form,
+          surface: formattedSurface,
           romaji: wanakana.toRomaji(t.surface_form),
           meaning: "",
           pos: mapPos(t.pos, t.pos_detail_1),
@@ -493,13 +506,17 @@ async function main() {
       lineTranslation = jishoMeaning.split(";")[0].trim();
     }
 
-    // Capitalize first letter of translation line if present
-    lineTranslation = capitalizeFirstLetter(lineTranslation);
+    // Capitalize translation line
+    lineTranslation = capitalizeFirstWord(lineTranslation);
+
+    // Format raw text so only the first word is capitalized ("new world" -> "New world")
+    const rawText = capitalizeFirstWord(rawLines[i].text);
 
     return {
       id: `l${i + 1}`,
       start: rawLines[i].start,
       end: rawLines[i].end,
+      text: rawText,
       tokens: tokens.map(({ lookupWord, rawPos, baseForm, conjugation, ...token }) => {
         if (token.meaning) return token;
 
