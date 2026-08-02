@@ -12,6 +12,7 @@ export interface WordToken {
   /** If true, this token is punctuation/whitespace and isn't hoverable */
   skip?: boolean;
   baseForm?: string; // e.g. "変える"
+  lookupWord?: string; // dictionary search term for token used as jisho lookup and cache key
   conjugation?: string | null; // e.g. "te-form"
   /**
    * Optional word-level timestamp in seconds. If every token in a line has

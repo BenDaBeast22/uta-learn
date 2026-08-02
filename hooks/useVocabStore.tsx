@@ -7,6 +7,8 @@ import { createClient } from "@/lib/supabase/client";
 export interface WordToken {
   surface: string;
   romaji?: string;
+  baseForm?: string;
+  conjugation?: string | null;
   meaning?: string;
   pos?: string;
 }
@@ -15,6 +17,7 @@ export interface SavedVocabItem {
   id: string;
   token: WordToken;
   contextSentence?: string;
+  contextSurface?: string;
   songTitle?: string;
   songId?: string;
 }
@@ -36,17 +39,16 @@ export function VocabProvider({ children }: { children: React.ReactNode }) {
   // 1. Load initial user vocab
   useEffect(() => {
     async function loadVocab() {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
       if (!user) {
         setIsLoaded(true);
         return;
       }
 
-      const { data, error } = await supabase
-        .from("user_vocab")
-        .select("*")
-        .order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("user_vocab").select("*").order("created_at", { ascending: false });
 
       if (!error && data) {
         const formatted: SavedVocabItem[] = data.map((row) => ({
@@ -70,71 +72,73 @@ export function VocabProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // 2. Optimistic Add (Updates UI in 0ms)
-  const addVocab = useCallback(async (item: Omit<SavedVocabItem, "id">) => {
-    const tempId = `temp-${Date.now()}`;
-    const tempItem: SavedVocabItem = { id: tempId, ...item };
+  const addVocab = useCallback(
+    async (item: Omit<SavedVocabItem, "id">) => {
+      const tempId = `temp-${Date.now()}`;
+      const tempItem: SavedVocabItem = { id: tempId, ...item };
 
-    // ⚡ Immediately update UI state
-    setVocab((prev) => {
-      if (prev.some((v) => v.token.surface === item.token.surface)) return prev;
-      return [tempItem, ...prev];
-    });
+      // ⚡ Immediately update UI state
+      setVocab((prev) => {
+        if (prev.some((v) => v.token.surface === item.token.surface)) return prev;
+        return [tempItem, ...prev];
+      });
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      console.warn("User not authenticated. Reverting vocab save.");
-      setVocab((prev) => prev.filter((v) => v.id !== tempId));
-      return;
-    }
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        console.warn("User not authenticated. Reverting vocab save.");
+        setVocab((prev) => prev.filter((v) => v.id !== tempId));
+        return;
+      }
 
-    const { data, error } = await supabase
-      .from("user_vocab")
-      .insert({
-        user_id: user.id,
-        surface: item.token.surface,
-        romaji: item.token.romaji,
-        meaning: item.token.meaning,
-        pos: item.token.pos,
-        context_sentence: item.contextSentence,
-        song_title: item.songTitle,
-        song_id: item.songId,
-      })
-      .select()
-      .single();
+      const { data, error } = await supabase
+        .from("user_vocab")
+        .insert({
+          user_id: user.id,
+          surface: item.token.surface,
+          romaji: item.token.romaji,
+          meaning: item.token.meaning,
+          pos: item.token.pos,
+          context_sentence: item.contextSentence,
+          song_title: item.songTitle,
+          song_id: item.songId,
+        })
+        .select()
+        .single();
 
-    if (error) {
-      console.error("Failed to persist vocab in Supabase:", error);
-      setVocab((prev) => prev.filter((v) => v.id !== tempId));
-    } else if (data) {
-      setVocab((prev) =>
-        prev.map((v) => (v.id === tempId ? { ...v, id: data.id } : v))
-      );
-    }
-  }, [supabase]);
+      if (error) {
+        console.error("Failed to persist vocab in Supabase:", error);
+        setVocab((prev) => prev.filter((v) => v.id !== tempId));
+      } else if (data) {
+        setVocab((prev) => prev.map((v) => (v.id === tempId ? { ...v, id: data.id } : v)));
+      }
+    },
+    [supabase],
+  );
 
   // 3. Optimistic Delete
-  const removeVocab = useCallback(async (idOrSurface: string) => {
-    let targetId = idOrSurface;
+  const removeVocab = useCallback(
+    async (idOrSurface: string) => {
+      let targetId = idOrSurface;
 
-    setVocab((prev) => {
-      const found = prev.find((v) => v.id === idOrSurface || v.token.surface === idOrSurface);
-      if (found) targetId = found.id;
-      return prev.filter((v) => v.id !== idOrSurface && v.token.surface !== idOrSurface);
-    });
+      setVocab((prev) => {
+        const found = prev.find((v) => v.id === idOrSurface || v.token.surface === idOrSurface);
+        if (found) targetId = found.id;
+        return prev.filter((v) => v.id !== idOrSurface && v.token.surface !== idOrSurface);
+      });
 
-    if (targetId.startsWith("temp-")) return;
+      if (targetId.startsWith("temp-")) return;
 
-    const { error } = await supabase.from("user_vocab").delete().eq("id", targetId);
-    if (error) {
-      console.error("Failed to delete vocab from Supabase:", error);
-    }
-  }, [supabase]);
-
-  return (
-    <VocabContext.Provider value={{ vocab, isLoaded, addVocab, removeVocab }}>
-      {children}
-    </VocabContext.Provider>
+      const { error } = await supabase.from("user_vocab").delete().eq("id", targetId);
+      if (error) {
+        console.error("Failed to delete vocab from Supabase:", error);
+      }
+    },
+    [supabase],
   );
+
+  return <VocabContext.Provider value={{ vocab, isLoaded, addVocab, removeVocab }}>{children}</VocabContext.Provider>;
 }
 
 export function useVocabStore() {

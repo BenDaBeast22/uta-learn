@@ -2,11 +2,12 @@
 
 import type { WordToken as WordTokenData } from "@/lib/types";
 import WordToken from "./WordToken";
+import { LyricDisplayMode } from "@/lib/types";
 
 interface LyricLineProps {
   tokens: WordTokenData[];
   songTitle?: string;
-  displayMode: string;
+  displayMode?: LyricDisplayMode;
   translation?: string; // 👈 Read directly from line.translation
 }
 

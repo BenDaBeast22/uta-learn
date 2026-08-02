@@ -8,7 +8,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l1",
     "start": 0.42,
     "end": 4.42,
-    "text": "新時代はこの未来だ",
     "tokens": [
       {
         "surface": "新",
@@ -74,7 +73,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l2",
     "start": 4.42,
     "end": 7.41,
-    "text": "世界中全部",
     "tokens": [
       {
         "surface": "世界中",
@@ -103,7 +101,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l3",
     "start": 7.41,
     "end": 12.18,
-    "text": "変えてしまえば",
     "tokens": [
       {
         "surface": "変えて",
@@ -142,7 +139,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l4",
     "start": 12.18,
     "end": 22.64,
-    "text": "変えてしまえば",
     "tokens": [
       {
         "surface": "変えて",
@@ -181,7 +177,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l5",
     "start": 22.64,
     "end": 44.08,
-    "text": "♪",
     "tokens": [
       {
         "surface": "♪",
@@ -200,7 +195,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l6",
     "start": 44.08,
     "end": 44.91,
-    "text": "ジャマモノ",
     "tokens": [
       {
         "surface": "ジャマモノ",
@@ -219,7 +213,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l7",
     "start": 44.91,
     "end": 45.67,
-    "text": "やなもの",
     "tokens": [
       {
         "surface": "や",
@@ -258,7 +251,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l8",
     "start": 45.67,
     "end": 46.97,
-    "text": "なんて消して",
     "tokens": [
       {
         "surface": "なんて",
@@ -287,7 +279,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l9",
     "start": 46.97,
     "end": 49.54,
-    "text": "この世とメタモルフォーゼしようぜ",
     "tokens": [
       {
         "surface": "この世",
@@ -343,7 +334,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l10",
     "start": 49.54,
     "end": 51.34,
-    "text": "ミュージック",
     "tokens": [
       {
         "surface": "ミュージック",
@@ -362,7 +352,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l11",
     "start": 51.34,
     "end": 52.43,
-    "text": "キミが起こす",
     "tokens": [
       {
         "surface": "キミ",
@@ -398,7 +387,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l12",
     "start": 52.43,
     "end": 53.54,
-    "text": "マジック",
     "tokens": [
       {
         "surface": "マジック",
@@ -417,7 +405,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l13",
     "start": 53.54,
     "end": 55.06,
-    "text": "♪",
     "tokens": [
       {
         "surface": "♪",
@@ -436,7 +423,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l14",
     "start": 55.06,
     "end": 57.75,
-    "text": "目を閉じれば未来が開いて",
     "tokens": [
       {
         "surface": "目",
@@ -509,7 +495,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l15",
     "start": 57.75,
     "end": 62.14,
-    "text": "いつまでも終わりが来ないようにって",
     "tokens": [
       {
         "surface": "いつ",
@@ -596,7 +581,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l16",
     "start": 62.14,
     "end": 64.66,
-    "text": "この歌を歌うよ",
     "tokens": [
       {
         "surface": "この",
@@ -649,7 +633,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l17",
     "start": 64.66,
     "end": 66.3,
-    "text": "Ooh",
     "tokens": [
       {
         "surface": "Ooh",
@@ -668,7 +651,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l18",
     "start": 66.3,
     "end": 67.24,
-    "text": "Do you wanna play?",
     "tokens": [
       {
         "surface": "Do",
@@ -757,7 +739,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l19",
     "start": 67.24,
     "end": 68.97,
-    "text": "リアルゲーム ギリギリ",
     "tokens": [
       {
         "surface": "リアル",
@@ -806,7 +787,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l20",
     "start": 68.97,
     "end": 71.97,
-    "text": "綱渡りみたいな旋律",
     "tokens": [
       {
         "surface": "綱渡り",
@@ -855,7 +835,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l21",
     "start": 71.97,
     "end": 74.48,
-    "text": "認めない戻れない忘れたい",
     "tokens": [
       {
         "surface": "認めない",
@@ -894,7 +873,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l22",
     "start": 74.48,
     "end": 76.65,
-    "text": "夢の中に居させて",
     "tokens": [
       {
         "surface": "夢",
@@ -957,7 +935,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l23",
     "start": 76.65,
     "end": 78.87,
-    "text": "I wanna be free",
     "tokens": [
       {
         "surface": "I",
@@ -1036,7 +1013,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l24",
     "start": 78.87,
     "end": 81.75,
-    "text": "見えるよ新時代が",
     "tokens": [
       {
         "surface": "見える",
@@ -1089,7 +1065,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l25",
     "start": 81.75,
     "end": 84.5,
-    "text": "世界の向こうへ",
     "tokens": [
       {
         "surface": "世界",
@@ -1132,7 +1107,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l26",
     "start": 84.5,
     "end": 85.3,
-    "text": "さあ行くよ",
     "tokens": [
       {
         "surface": "さあ",
@@ -1168,7 +1142,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l27",
     "start": 85.3,
     "end": 87.24,
-    "text": "New world",
     "tokens": [
       {
         "surface": "New",
@@ -1207,7 +1180,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l28",
     "start": 87.24,
     "end": 88.18,
-    "text": "♪",
     "tokens": [
       {
         "surface": "♪",
@@ -1226,7 +1198,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l29",
     "start": 88.18,
     "end": 90.51,
-    "text": "新時代はこの未来だ",
     "tokens": [
       {
         "surface": "新",
@@ -1292,7 +1263,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l30",
     "start": 90.51,
     "end": 92.65,
-    "text": "世界中全部",
     "tokens": [
       {
         "surface": "世界中",
@@ -1321,7 +1291,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l31",
     "start": 92.65,
     "end": 95.49,
-    "text": "変えてしまえば",
     "tokens": [
       {
         "surface": "変えて",
@@ -1360,7 +1329,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l32",
     "start": 95.49,
     "end": 99.15,
-    "text": "変えてしまえば",
     "tokens": [
       {
         "surface": "変えて",
@@ -1399,7 +1367,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l33",
     "start": 99.15,
     "end": 103.62,
-    "text": "果てしない音楽がもっと届くように",
     "tokens": [
       {
         "surface": "果てしない",
@@ -1472,7 +1439,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l34",
     "start": 103.62,
     "end": 106.29,
-    "text": "夢は見ないわ",
     "tokens": [
       {
         "surface": "夢",
@@ -1518,7 +1484,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l35",
     "start": 106.29,
     "end": 110.44,
-    "text": "キミが話した 「ボクを信じて」",
     "tokens": [
       {
         "surface": "キミ",
@@ -1611,7 +1576,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l36",
     "start": 110.44,
     "end": 118.59,
-    "text": "♪",
     "tokens": [
       {
         "surface": "♪",
@@ -1630,7 +1594,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l37",
     "start": 118.59,
     "end": 123.85,
-    "text": "Ooh",
     "tokens": [
       {
         "surface": "Ooh",
@@ -1649,7 +1612,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l38",
     "start": 123.85,
     "end": 132.01,
-    "text": "♪",
     "tokens": [
       {
         "surface": "♪",
@@ -1668,7 +1630,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l39",
     "start": 132.01,
     "end": 134.56,
-    "text": "あれこれいらないものは消して",
     "tokens": [
       {
         "surface": "あれこれ",
@@ -1724,7 +1685,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l40",
     "start": 134.56,
     "end": 137.26,
-    "text": "リアルをカラフルに越えようぜ",
     "tokens": [
       {
         "surface": "リアル",
@@ -1787,7 +1747,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l41",
     "start": 137.26,
     "end": 139.11,
-    "text": "ミュージック",
     "tokens": [
       {
         "surface": "ミュージック",
@@ -1806,7 +1765,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l42",
     "start": 139.11,
     "end": 140.16,
-    "text": "今始まる",
     "tokens": [
       {
         "surface": "今",
@@ -1835,7 +1793,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l43",
     "start": 140.16,
     "end": 142.65,
-    "text": "ライジング",
     "tokens": [
       {
         "surface": "ライジング",
@@ -1854,7 +1811,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l44",
     "start": 142.65,
     "end": 145.61,
-    "text": "目をつぶりみんなで逃げようよ",
     "tokens": [
       {
         "surface": "目",
@@ -1924,7 +1880,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l45",
     "start": 145.61,
     "end": 150.08,
-    "text": "今よりイイモノを見せてあげるよ",
     "tokens": [
       {
         "surface": "今",
@@ -2007,7 +1962,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l46",
     "start": 150.08,
     "end": 152.57,
-    "text": "この歌を歌えば",
     "tokens": [
       {
         "surface": "この",
@@ -2063,7 +2017,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l47",
     "start": 152.57,
     "end": 154.03,
-    "text": "Aah",
     "tokens": [
       {
         "surface": "Aah",
@@ -2082,7 +2035,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l48",
     "start": 154.03,
     "end": 155.07,
-    "text": "Do you wanna play?",
     "tokens": [
       {
         "surface": "Do",
@@ -2171,7 +2123,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l49",
     "start": 155.07,
     "end": 156.49,
-    "text": "リアルゲーム ギリギリ",
     "tokens": [
       {
         "surface": "リアル",
@@ -2220,7 +2171,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l50",
     "start": 156.49,
     "end": 159.47,
-    "text": "綱渡りみたいな運命",
     "tokens": [
       {
         "surface": "綱渡り",
@@ -2269,7 +2219,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l51",
     "start": 159.47,
     "end": 162.33,
-    "text": "認めない戻れない忘れたい",
     "tokens": [
       {
         "surface": "認めない",
@@ -2308,7 +2257,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l52",
     "start": 162.33,
     "end": 164.48,
-    "text": "夢の中に居させて",
     "tokens": [
       {
         "surface": "夢",
@@ -2371,7 +2319,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l53",
     "start": 164.48,
     "end": 166.42,
-    "text": "I wanna be free",
     "tokens": [
       {
         "surface": "I",
@@ -2450,7 +2397,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l54",
     "start": 166.42,
     "end": 169.33,
-    "text": "見えるよ新時代が",
     "tokens": [
       {
         "surface": "見える",
@@ -2503,7 +2449,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l55",
     "start": 169.33,
     "end": 171.97,
-    "text": "世界の向こうへ",
     "tokens": [
       {
         "surface": "世界",
@@ -2546,7 +2491,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l56",
     "start": 171.97,
     "end": 173.24,
-    "text": "さあ行くよ",
     "tokens": [
       {
         "surface": "さあ",
@@ -2582,7 +2526,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l57",
     "start": 173.24,
     "end": 174.86,
-    "text": "New world",
     "tokens": [
       {
         "surface": "New",
@@ -2621,7 +2564,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l58",
     "start": 174.86,
     "end": 175.89,
-    "text": "♪",
     "tokens": [
       {
         "surface": "♪",
@@ -2640,7 +2582,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l59",
     "start": 175.89,
     "end": 177.2,
-    "text": "信じたいわ",
     "tokens": [
       {
         "surface": "信じたい",
@@ -2669,7 +2610,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l60",
     "start": 177.2,
     "end": 178.68,
-    "text": "この未来を",
     "tokens": [
       {
         "surface": "この",
@@ -2705,7 +2645,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l61",
     "start": 178.68,
     "end": 180.36,
-    "text": "世界中全部",
     "tokens": [
       {
         "surface": "世界中",
@@ -2734,7 +2673,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l62",
     "start": 180.36,
     "end": 183.2,
-    "text": "変えてしまえば",
     "tokens": [
       {
         "surface": "変えて",
@@ -2773,7 +2711,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l63",
     "start": 183.2,
     "end": 186.61,
-    "text": "変えてしまえば",
     "tokens": [
       {
         "surface": "変えて",
@@ -2812,7 +2749,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l64",
     "start": 186.61,
     "end": 191.33,
-    "text": "果てしない音楽がもっと届くように",
     "tokens": [
       {
         "surface": "果てしない",
@@ -2885,7 +2821,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l65",
     "start": 191.33,
     "end": 194.12,
-    "text": "夢を見せるよ",
     "tokens": [
       {
         "surface": "夢",
@@ -2928,7 +2863,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l66",
     "start": 194.12,
     "end": 196.76,
-    "text": "夢を見せるよ",
     "tokens": [
       {
         "surface": "夢",
@@ -2971,7 +2905,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l67",
     "start": 196.76,
     "end": 198.22,
-    "text": "新時代だ",
     "tokens": [
       {
         "surface": "新",
@@ -3010,7 +2943,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l68",
     "start": 198.22,
     "end": 206.52,
-    "text": "♪",
     "tokens": [
       {
         "surface": "♪",
@@ -3029,7 +2961,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l69",
     "start": 206.52,
     "end": 211.68,
-    "text": "Ooh",
     "tokens": [
       {
         "surface": "Ooh",
@@ -3048,7 +2979,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l70",
     "start": 211.68,
     "end": 218.72,
-    "text": "♪",
     "tokens": [
       {
         "surface": "♪",
@@ -3067,7 +2997,6 @@ export const newGenesisLyrics: LyricLine[] = [
     "id": "l71",
     "start": 218.72,
     "end": 222.72,
-    "text": "新時代だ",
     "tokens": [
       {
         "surface": "新",

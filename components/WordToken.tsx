@@ -135,7 +135,7 @@ export default function WordToken({
       return <span className="font-mono text-sm sm:text-base">{token.romaji}</span>;
     }
 
-    if (displayMode === "dual") {
+    if (displayMode === "furigana") {
       return (
         <ruby className="inline-flex flex-col-reverse items-center align-bottom">
           <span>{token.surface}</span>

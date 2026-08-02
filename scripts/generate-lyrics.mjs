@@ -516,7 +516,6 @@ async function main() {
       id: `l${i + 1}`,
       start: rawLines[i].start,
       end: rawLines[i].end,
-      text: rawText,
       tokens: tokens.map(({ lookupWord, rawPos, baseForm, conjugation, ...token }) => {
         if (token.meaning) return token;
 
