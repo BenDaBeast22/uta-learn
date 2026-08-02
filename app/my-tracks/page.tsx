@@ -1,12 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
 import TrackCard from "@/components/TrackCard";
 import type { Track } from "@/lib/types";
-
-const STORAGE_KEY = "lingotrack_custom_tracks";
+import { createClient } from "@/lib/supabase/client";
 
 export default function MyTracksPage() {
+  const supabase = createClient();
+
+  const [user, setUser] = useState<any>(null);
+  const [authLoading, setAuthLoading] = useState(true);
+
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
   const [youtubeUrl, setYoutubeUrl] = useState("");
@@ -16,38 +21,70 @@ export default function MyTracksPage() {
   const [error, setError] = useState<string | null>(null);
   const [tracks, setTracks] = useState<Track[]>([]);
 
-  // Load custom tracks from localStorage on mount
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        setTracks(JSON.parse(saved));
+  // 1. Fetch user & load their custom tracks from Supabase
+  const loadUserTracks = useCallback(
+    async (userId: string) => {
+      const { data, error } = await supabase
+        .from("custom_tracks")
+        .select("id, track_data")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Failed to load tracks from Supabase:", error.message);
+        return;
       }
-    } catch (err) {
-      console.error("Failed to load tracks from localStorage", err);
-    }
-  }, []);
 
-  // Sync tracks state to localStorage whenever tracks change
-  const saveTracksToStorage = (updatedTracks: Track[]) => {
-    setTracks(updatedTracks);
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedTracks));
-    } catch (err) {
-      console.error("Failed to save tracks to localStorage", err);
+      if (data) {
+        const parsedTracks: Track[] = data.map((row) => ({
+          ...row.track_data,
+          id: row.id, // Use Supabase row UUID as track ID
+          isCustom: true,
+        }));
+        setTracks(parsedTracks);
+      }
+    },
+    [supabase],
+  );
+
+  useEffect(() => {
+    async function checkUser() {
+      const {
+        data: { user: currentUser },
+      } = await supabase.auth.getUser();
+
+      setUser(currentUser);
+      setAuthLoading(false);
+
+      if (currentUser) {
+        await loadUserTracks(currentUser.id);
+      }
+    }
+
+    checkUser();
+  }, [supabase, loadUserTracks]);
+
+  // 2. Delete track from Supabase
+  const handleDeleteTrack = async (trackId: string, trackTitle: string) => {
+    if (!user) return;
+    if (!confirm(`Are you sure you want to delete "${trackTitle}"?`)) return;
+
+    // Optimistic UI update
+    setTracks((prev) => prev.filter((t) => t.id !== trackId));
+
+    const { error } = await supabase.from("custom_tracks").delete().eq("id", trackId).eq("user_id", user.id);
+
+    if (error) {
+      console.error("Failed to delete track from Supabase:", error.message);
+      // Revert if error
+      await loadUserTracks(user.id);
     }
   };
 
-  // Delete handler strictly for custom imported tracks
-  const handleDeleteTrack = (trackId: string, trackTitle: string) => {
-    if (confirm(`Are you sure you want to delete "${trackTitle}"?`)) {
-      const updated = tracks.filter((t) => t.id !== trackId);
-      saveTracksToStorage(updated);
-    }
-  };
-
+  // 3. Import & Save track to Supabase
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) return;
     if (!title.trim() || !artist.trim()) return;
 
     setLoading(true);
@@ -81,14 +118,30 @@ export default function MyTracksPage() {
         throw new Error(data.error || "Failed to import track.");
       }
 
-      // Explicitly flag imported tracks as custom
-      const newTrack: Track = { ...data.track, isCustom: true };
+      const importedTrack: Track = { ...data.track, isCustom: true };
 
-      // Add new track and persist to localStorage
-      const updated = [newTrack, ...tracks];
-      saveTracksToStorage(updated);
+      // Save row to Supabase custom_tracks table
+      const { data: dbData, error: dbError } = await supabase
+        .from("custom_tracks")
+        .insert({
+          user_id: user.id,
+          title: title.trim(),
+          artist: artist.trim(),
+          youtube_url: youtubeUrl.trim() || null,
+          track_data: importedTrack,
+        })
+        .select("id")
+        .single();
 
-      // Reset form fields
+      if (dbError) {
+        throw new Error(`Failed to save track to database: ${dbError.message}`);
+      }
+
+      // Add new track with its DB assigned ID
+      const finalTrack: Track = { ...importedTrack, id: dbData.id };
+      setTracks((prev) => [finalTrack, ...prev]);
+
+      // Reset form
       setTitle("");
       setArtist("");
       setYoutubeUrl("");
@@ -126,8 +179,30 @@ export default function MyTracksPage() {
         </div>
       </header>
 
+      {/* Guest Lock Banner */}
+      {!authLoading && !user && (
+        <div className="mb-12 flex flex-col gap-3 sm:flex-row sm:items-center justify-between rounded-xl border border-gold/30 bg-gold/5 p-6">
+          <div>
+            <h3 className="font-display text-lg font-bold text-gold">Account Required</h3>
+            <p className="mt-1 text-xs text-paper/70 font-body">
+              Sign in or create an account to save custom tracks and access them across all your devices.
+            </p>
+          </div>
+          <Link
+            href="/login"
+            className="inline-flex shrink-0 items-center justify-center rounded-lg border border-gold/30 bg-gold px-4 py-2 font-mono text-xs font-semibold text-ink transition hover:bg-gold/90"
+          >
+            Sign In / Register →
+          </Link>
+        </div>
+      )}
+
       {/* Add Track Form Panel */}
-      <div className="mb-12 rounded-xl border border-paper/10 bg-paper/5 p-6 shadow-tag sm:p-8">
+      <div
+        className={`mb-12 rounded-xl border border-paper/10 bg-paper/5 p-6 shadow-tag sm:p-8 ${
+          !user ? "opacity-50 pointer-events-none select-none" : ""
+        }`}
+      >
         <h2 className="font-display text-xl font-bold text-paper mb-4">Add a New Track</h2>
 
         {/* Error Alert Box */}
@@ -161,7 +236,7 @@ export default function MyTracksPage() {
                 placeholder="e.g. Otonoke"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                disabled={loading}
+                disabled={loading || !user}
                 className="w-full rounded-lg border border-paper/10 bg-paper/5 px-4 py-2.5 font-body text-sm text-paper placeholder-paper/30 outline-none transition focus:border-gold/50 focus:ring-1 focus:ring-gold/50 disabled:opacity-50"
               />
             </div>
@@ -176,7 +251,7 @@ export default function MyTracksPage() {
                 placeholder="e.g. Creepy Nuts"
                 value={artist}
                 onChange={(e) => setArtist(e.target.value)}
-                disabled={loading}
+                disabled={loading || !user}
                 className="w-full rounded-lg border border-paper/10 bg-paper/5 px-4 py-2.5 font-body text-sm text-paper placeholder-paper/30 outline-none transition focus:border-gold/50 focus:ring-1 focus:ring-gold/50 disabled:opacity-50"
               />
             </div>
@@ -191,12 +266,12 @@ export default function MyTracksPage() {
               placeholder="e.g. https://www.youtube.com/watch?v=..."
               value={youtubeUrl}
               onChange={(e) => setYoutubeUrl(e.target.value)}
-              disabled={loading}
+              disabled={loading || !user}
               className="w-full rounded-lg border border-paper/10 bg-paper/5 px-4 py-2.5 font-body text-sm text-paper placeholder-paper/30 outline-none transition focus:border-gold/50 focus:ring-1 focus:ring-gold/50 disabled:opacity-50"
             />
           </div>
 
-          {/* Progress Indicator Banner when loading */}
+          {/* Progress Indicator Banner */}
           {loading && (
             <div className="flex items-center gap-3 rounded-lg border border-gold/20 bg-gold/5 p-3.5 text-gold">
               <svg
@@ -219,7 +294,7 @@ export default function MyTracksPage() {
           <div className="pt-2 flex justify-end">
             <button
               type="submit"
-              disabled={loading || !title.trim() || !artist.trim()}
+              disabled={loading || !user || !title.trim() || !artist.trim()}
               className="inline-flex items-center justify-center rounded-lg border border-gold/30 bg-gold/10 px-5 py-2.5 font-mono text-xs font-semibold text-gold transition hover:border-gold hover:bg-gold hover:text-ink disabled:opacity-40 disabled:hover:border-gold/30 disabled:hover:bg-gold/10 disabled:hover:text-gold"
             >
               {loading ? "Processing..." : "Add Track"}
@@ -242,11 +317,13 @@ export default function MyTracksPage() {
           <div className="rounded-xl border border-dashed border-paper/10 bg-paper/5 p-12 text-center">
             <p className="font-display text-xl text-paper">No custom tracks imported yet</p>
             <p className="mt-2 font-body text-sm text-paper/60">
-              Enter a song title and artist above to fetch synced lyrics and definitions.
+              {user
+                ? "Enter a song title and artist above to fetch synced lyrics and definitions."
+                : "Sign in to add custom tracks to your account."}
             </p>
           </div>
         ) : (
-          /* Track Grid using TrackCard */
+          /* Track Grid */
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {tracks.map((track, i) => (
               <TrackCard key={track.id} track={track} index={i} onDelete={handleDeleteTrack} />

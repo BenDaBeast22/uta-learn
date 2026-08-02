@@ -11,6 +11,8 @@ export interface WordToken {
   pos?: string;
   /** If true, this token is punctuation/whitespace and isn't hoverable */
   skip?: boolean;
+  baseForm?: string; // e.g. "変える"
+  conjugation?: string | null; // e.g. "te-form"
   /**
    * Optional word-level timestamp in seconds. If every token in a line has
    * this set, the app builds an "enhanced" LRC line so Liricle can report

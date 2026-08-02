@@ -2,6 +2,7 @@ import Navbar from "@/components/Navbar";
 import { createClient } from "@/lib/supabase/server";
 import type { Metadata } from "next";
 import "./globals.css";
+import { VocabProvider } from "@/hooks/useVocabStore";
 
 export const metadata: Metadata = {
   title: "Uta Learn — Learn Japanese through song",
@@ -22,7 +23,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="en">
       <body className=" min-h-screen bg-ink text-paper antialiased">
         <Navbar userEmail={user?.email ?? null} />
-        {children}
+        <VocabProvider>{children}</VocabProvider>
       </body>
     </html>
   );

@@ -1,15 +1,14 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { WordToken as WordTokenData, LyricDisplayMode } from "@/lib/types";
 import { useVocabStore } from "@/hooks/useVocabStore";
 
 const POPOVER_WIDTH = 208;
-const POPOVER_EST_HEIGHT = 160;
+const POPOVER_EST_HEIGHT = 180;
 const VIEWPORT_MARGIN = 8;
 
-// Helper: Check if string contains any Japanese characters (Kanji, Hiragana, Katakana)
 export function isJapaneseText(text?: string): boolean {
   if (!text) return false;
   return /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/u.test(text);
@@ -38,9 +37,17 @@ export default function WordToken({
   const triggerRef = useRef<HTMLSpanElement>(null);
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Hook for adding/removing vocabulary and checking saved state
-  const { addVocab, removeVocab, isSaved } = useVocabStore();
-  const saved = isSaved(token);
+  // Derive target dictionary headword (e.g., "変える" over "変えて")
+  const headword = token.baseForm || token.surface;
+
+  // 1. Pull `vocab` array directly from store
+  const { vocab, addVocab, removeVocab, isLoaded } = useVocabStore();
+
+  // 2. Derive saved state based on dictionary base form (headword)
+  const saved = useMemo(() => {
+    if (!isLoaded || !headword) return false;
+    return vocab.some((v) => v.token.surface === headword || v.token.baseForm === headword);
+  }, [vocab, isLoaded, headword]);
 
   useEffect(() => {
     return () => {
@@ -50,7 +57,6 @@ export default function WordToken({
     };
   }, []);
 
-  // Guard: Skip popover interactive state for marked tokens OR non-Japanese text (English, numbers, symbols)
   const isJp = isJapaneseText(token.surface);
   if (token.skip || !isJp) {
     return <span>{displayMode === "romaji" ? token.romaji || token.surface : token.surface}</span>;
@@ -75,7 +81,6 @@ export default function WordToken({
   }
 
   function handleMouseEnter() {
-    // Instantly cancel any closing timer from leaving previous elements
     if (closeTimeoutRef.current) {
       clearTimeout(closeTimeoutRef.current);
       closeTimeoutRef.current = null;
@@ -107,10 +112,21 @@ export default function WordToken({
   const handleToggleSave = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (saved) {
-      const id = `${token.surface}_${token.romaji || ""}`;
-      removeVocab(id);
+      removeVocab(headword);
     } else {
-      addVocab(token, songTitle, contextSentence);
+      addVocab({
+        token: {
+          surface: headword, // Saves base form "変える"
+          romaji: token.romaji,
+          meaning: token.meaning,
+          pos: token.pos,
+          baseForm: headword,
+          conjugation: token.conjugation,
+        },
+        songTitle,
+        contextSentence, // Lyrics line context
+        contextSurface: token.surface, // Lyric token context "変えて"
+      });
     }
   };
 
@@ -133,7 +149,6 @@ export default function WordToken({
     return token.surface;
   };
 
-  // Combine active state, CSS hover, and state-driven hover so the highlight never drops
   const isHighlighted = isHovered || active;
 
   return (
@@ -157,7 +172,7 @@ export default function WordToken({
             role="tooltip"
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
-            className={`pointer-events-auto fixed z-50 w-max max-w-[13rem] transition-all duration-100 ease-out ${
+            className={`pointer-events-auto fixed z-50 w-max max-w-[13.5rem] transition-all duration-100 ease-out ${
               isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
             }`}
             style={{
@@ -179,17 +194,36 @@ export default function WordToken({
               {/* Nafuda tag punch hole */}
               <span className="absolute -top-1.5 left-1/2 h-3 w-3 -translate-x-1/2 rounded-full border border-gold/50 bg-ink" />
 
-              {/* Title / Reading */}
-              {displayMode === "romaji" ? (
-                <span className="block font-display text-base font-semibold leading-tight text-seal">
-                  {token.surface}
+              {/* Title / Reading / Conjugation Header */}
+              <div className="flex items-start justify-between gap-1">
+                <div>
+                  {displayMode === "romaji" ? (
+                    <span className="block font-display text-base font-semibold leading-tight text-seal">
+                      {token.surface}
+                    </span>
+                  ) : (
+                    <span className="block font-mono text-[0.7rem] uppercase tracking-wide text-seal">
+                      {token.romaji}
+                    </span>
+                  )}
+                </div>
+
+                {token.conjugation && (
+                  <span className="rounded bg-gold/20 px-1.5 py-0.5 font-mono text-[0.6rem] font-semibold text-seal border border-gold/40">
+                    {token.conjugation}
+                  </span>
+                )}
+              </div>
+
+              {/* Base Form Indicator (if conjugated) */}
+              {token.baseForm && token.baseForm !== token.surface && (
+                <span className="mt-0.5 block font-mono text-[0.65rem] text-ink/70">
+                  Base: <strong className="font-semibold text-seal">{token.baseForm}</strong>
                 </span>
-              ) : (
-                <span className="block font-mono text-[0.7rem] uppercase tracking-wide text-seal">{token.romaji}</span>
               )}
 
               {/* Translation */}
-              <span className="mt-0.5 block font-body text-sm leading-snug text-ink">{token.meaning}</span>
+              <span className="mt-1 block font-body text-sm leading-snug text-ink">{token.meaning}</span>
 
               {token.pos && (
                 <span className="mt-0.5 block font-mono text-[0.6rem] uppercase tracking-wider text-ink/50">
@@ -206,7 +240,7 @@ export default function WordToken({
                     saved ? "bg-seal/10 text-seal hover:bg-seal/20" : "bg-ink text-paper hover:bg-gold hover:text-ink"
                   }`}
                 >
-                  {saved ? "✓ Saved in Vocab" : "+ Add to Vocab"}
+                  {saved ? `✓ Saved "${headword}"` : `+ Add "${headword}"`}
                 </button>
               </div>
 

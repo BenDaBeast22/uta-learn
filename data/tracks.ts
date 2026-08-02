@@ -1,6 +1,6 @@
 import { Track } from "@/lib/types";
 import { mirageLyrics } from "./imports/mirage.lyrics.generated";
-import { newGenesis } from "./imports/new-genesis.lyrics.generated";
+import { newGenesisLyrics } from "./imports/new-genesis.lyrics.generated";
 import { idolLyrics } from "./imports/idol.lyrics.generated";
 import { irisOutLyrics } from "./imports/iris-out.lyrics.generated";
 import { groovinMagicLyrics } from "./imports/groovin-magic.lyrics.generated";
@@ -50,7 +50,7 @@ export const tracks: Track[] = [
     youtubeId: "1FliVTcX8bQ",
     accent: accentColors.beginner,
     summary: "Lets create our own new world!",
-    lyrics: newGenesis,
+    lyrics: newGenesisLyrics,
   },
   {
     id: "iris-out",

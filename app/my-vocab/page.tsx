@@ -26,34 +26,28 @@ export default function MyVocabPage() {
     };
 
     const rows = vocab.map((item) => {
-      // Column 1 (Front): Japanese Word
       const front = `"${escapeCsv(item.token.surface)}"`;
 
-      // Column 2 (Back): Styled HTML structure for clean rendering
       let backHtmlParts: string[] = [];
 
-      // Romaji / Reading
       if (item.token.romaji) {
         backHtmlParts.push(
           `<div style="font-size: 1.2em; color: #d97706; font-weight: 600; font-family: monospace;">${item.token.romaji}</div>`,
         );
       }
 
-      // Meaning / Definition
       if (item.token.meaning) {
         backHtmlParts.push(
           `<div style="margin-top: 6px; font-size: 1.1em; line-height: 1.4;">${item.token.meaning}</div>`,
         );
       }
 
-      // Part of Speech Tag
       if (item.token.pos) {
         backHtmlParts.push(
           `<div style="margin-top: 6px; display: inline-block; padding: 2px 6px; font-size: 0.7em; text-transform: uppercase; border: 1px solid #ccc; border-radius: 4px; opacity: 0.6;">${item.token.pos}</div>`,
         );
       }
 
-      // Context Sentence
       if (item.contextSentence) {
         backHtmlParts.push(`<hr style="margin: 12px 0 8px 0; border: none; border-top: 1px solid #eee;" />`);
         backHtmlParts.push(
@@ -61,7 +55,6 @@ export default function MyVocabPage() {
         );
       }
 
-      // Song Source
       if (item.songTitle) {
         backHtmlParts.push(
           `<div style="margin-top: 4px; font-size: 0.75em; opacity: 0.5;">🎵 From: ${item.songTitle}</div>`,
@@ -73,8 +66,6 @@ export default function MyVocabPage() {
       return `${front},${back}`;
     });
 
-    // 1. Directives to auto-detect commas & enable HTML in Anki
-    // 2. UTF-8 BOM (\uFEFF) for correct character encoding
     const headerDirectives = "#separator:Comma\n#html:true\n";
     const csvContent = "\uFEFF" + headerDirectives + rows.join("\n");
 
@@ -88,6 +79,14 @@ export default function MyVocabPage() {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
+
+  if (!isLoaded) {
+    return (
+      <main className="mx-auto max-w-5xl px-6 py-12 sm:py-16">
+        <div className="text-center font-mono text-sm text-paper/40">Loading vocabulary from Supabase...</div>
+      </main>
+    );
+  }
 
   return (
     <main className="mx-auto max-w-5xl px-6 py-12 sm:py-16">

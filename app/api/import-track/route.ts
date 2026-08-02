@@ -4,19 +4,23 @@ import path from "node:path";
 import kuromoji from "kuromoji";
 import * as wanakana from "wanakana";
 
-export const maxDuration = 60; // Allows execution time for Jisho lookups on longer songs
-
-export type Level = "N5" | "N4" | "N3" | "N2" | "N1";
+export const maxDuration = 60; // Max allowed runtime on Pro/Self-hosted Next.js
 
 // Default accent class for user-imported custom tracks
-const CUSTOM_ACCENT = "#8C86C9"; // or whatever accent hex color you prefer
+const CUSTOM_ACCENT = "#8C86C9";
 
-// In-memory singletons across requests
+// In-memory singletons and cache across warm lambda invocations
 let tokenizerInstance: kuromoji.Tokenizer<kuromoji.IpadicFeatures> | null = null;
 const meaningCache = new Map<string, string>();
-const JISHO_DELAY_MS = 200; // Throttle to stay within Jisho rate limits
+const LRCLIB_TIMEOUT_MS = 8000;
 
-// Helper: Check if string contains any Japanese characters (Kanji, Hiragana, Katakana)
+// Identify your client properly according to LRCLIB rules
+const LRCLIB_HEADERS = {
+  "User-Agent": "uta-learn/1.0.0 (https://github.com/BenDaBeast22/uta-learn)",
+  "Lrclib-Client": "uta-learn/1.0.0",
+};
+
+// Helper: Check if string contains any Japanese characters
 function isJapaneseText(text: string): boolean {
   return /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/u.test(text);
 }
@@ -24,7 +28,6 @@ function isJapaneseText(text: string): boolean {
 async function getTokenizer(): Promise<kuromoji.Tokenizer<kuromoji.IpadicFeatures>> {
   if (tokenizerInstance) return tokenizerInstance;
 
-  // Point directly to kuromoji's dict inside node_modules
   const dictPath = path.join(process.cwd(), "node_modules", "kuromoji", "dict");
 
   return new Promise((resolve, reject) => {
@@ -40,14 +43,12 @@ async function getTokenizer(): Promise<kuromoji.Tokenizer<kuromoji.IpadicFeature
   });
 }
 
-/** Utility to extract an 11-character YouTube video ID from various URL formats */
 function extractYoutubeId(url?: string): string {
   if (!url) return "";
   const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
   return match ? match[1] : "";
 }
 
-/** Fetches duration in seconds for a given YouTube video ID via oEmbed page scraping/oembed fallback */
 async function getYoutubeDurationSeconds(youtubeId: string): Promise<number | null> {
   if (!youtubeId) return null;
 
@@ -63,7 +64,6 @@ async function getYoutubeDurationSeconds(youtubeId: string): Promise<number | nu
     if (!res.ok) return null;
     const html = await res.text();
 
-    // Extracts lengthSeconds from YouTube initial player response config
     const match = html.match(/"lengthSeconds":"(\d+)"/);
     if (match && match[1]) {
       return parseInt(match[1], 10);
@@ -75,30 +75,59 @@ async function getYoutubeDurationSeconds(youtubeId: string): Promise<number | nu
   return null;
 }
 
-/** Translates an array of Japanese lyric lines into English using Google Translate GTX */
+/** Robust Batch Translation using chunks to avoid HTTP 414 URL length limit */
 async function batchTranslateLines(lines: string[]): Promise<string[]> {
   if (lines.length === 0) return [];
 
+  // Break lines into chunks of 20 to avoid exceeding URL parameter limits
+  const CHUNK_SIZE = 20;
+  const results: string[] = [];
+
+  for (let i = 0; i < lines.length; i += CHUNK_SIZE) {
+    const chunk = lines.slice(i, i + CHUNK_SIZE);
+    const joinedText = chunk.join("\n");
+
+    try {
+      const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=ja&tl=en&dt=t&q=${encodeURIComponent(
+        joinedText,
+      )}`;
+
+      const res = await fetch(url);
+      if (!res.ok) {
+        results.push(...chunk.map(() => ""));
+        continue;
+      }
+
+      const data = await res.json();
+      if (!data || !data[0]) {
+        results.push(...chunk.map(() => ""));
+        continue;
+      }
+
+      const translatedText = data[0].map((c: any) => c[0] || "").join("");
+      const splitTranslated = translatedText.split("\n");
+
+      results.push(...splitTranslated);
+    } catch (err) {
+      console.error("Failed chunk translation:", err);
+      results.push(...chunk.map(() => ""));
+    }
+  }
+
+  return results;
+}
+
+async function fetchWithTimeout(url: string, options: RequestInit = {}, timeoutMs = LRCLIB_TIMEOUT_MS) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
   try {
-    const joinedText = lines.join("\n");
-    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=ja&tl=en&dt=t&q=${encodeURIComponent(
-      joinedText,
-    )}`;
-
-    const res = await fetch(url);
-    if (!res.ok) return [];
-
-    const data = await res.json();
-    if (!data || !data[0]) return [];
-
-    // Reconstruct full text response from Google chunk segments
-    const translatedText = data[0].map((chunk: any) => chunk[0] || "").join("");
-    const translatedLines = translatedText.split("\n");
-
-    return translatedLines;
-  } catch (err) {
-    console.error("Failed to batch translate lines:", err);
-    return [];
+    return await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    });
+  } finally {
+    clearTimeout(timeoutId);
   }
 }
 
@@ -111,14 +140,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Both title and artist are required." }, { status: 400 });
     }
 
-    // Extract YouTube ID if a YouTube URL was provided
     const youtubeId = extractYoutubeId(youtubeUrl);
-
-    // Fetch video duration directly from YouTube if video ID exists
     const ytDurationSeconds = await getYoutubeDurationSeconds(youtubeId);
 
-    // 1. Fetch synced lyrics from LRCLIB (passing duration parameter if fetched from YouTube)
-    let lrcData = null;
+    // 1. Fetch synced lyrics from LRCLIB
+    let lrcData: any = null;
 
     let getUrl = `https://lrclib.net/api/get?track_name=${encodeURIComponent(
       title,
@@ -128,40 +154,64 @@ export async function POST(req: NextRequest) {
       getUrl += `&duration=${ytDurationSeconds}`;
     }
 
-    const getRes = await fetch(getUrl, {
-      headers: { "User-Agent": "LingoTrack/1.0" },
-    });
+    try {
+      const getRes = await fetchWithTimeout(getUrl, { headers: LRCLIB_HEADERS });
 
-    const getContentType = getRes.headers.get("content-type") || "";
+      // Handle LRCLIB Rate Limiting (429) & Capacity Errors (502, 503, 504)
+      if (getRes.status === 429) {
+        const retryAfter = getRes.headers.get("Retry-After") || "5";
+        return NextResponse.json(
+          { error: `LRCLIB rate limit reached. Please wait ${retryAfter} seconds before trying again.` },
+          { status: 429 },
+        );
+      }
 
-    if (getRes.ok && getContentType.includes("application/json")) {
-      lrcData = await getRes.json();
-    } else {
-      // Direct match failed — try searching LRCLIB
-      const searchUrl = `https://lrclib.net/api/search?q=${encodeURIComponent(`${title} ${artist}`)}`;
-      const searchRes = await fetch(searchUrl, {
-        headers: { "User-Agent": "LingoTrack/1.0" },
-      });
+      if ([502, 503, 504].includes(getRes.status)) {
+        return NextResponse.json(
+          { error: "LRCLIB servers are currently overloaded. Please try again in a moment." },
+          { status: 503 },
+        );
+      }
 
-      const searchContentType = searchRes.headers.get("content-type") || "";
+      const getContentType = getRes.headers.get("content-type") || "";
 
-      if (searchRes.ok && searchContentType.includes("application/json")) {
-        const searchResults: any[] = await searchRes.json();
+      if (getRes.ok && getContentType.includes("application/json")) {
+        lrcData = await getRes.json();
+      } else if (getRes.status === 404) {
+        // Direct match failed — attempt searching LRCLIB
+        const searchUrl = `https://lrclib.net/api/search?q=${encodeURIComponent(`${title} ${artist}`)}`;
+        const searchRes = await fetchWithTimeout(searchUrl, { headers: LRCLIB_HEADERS });
 
-        // If we have a YouTube duration, find the result with the closest duration
-        if (ytDurationSeconds && searchResults.length > 0) {
-          const syncedWithDuration = searchResults
-            .filter((item: any) => item.syncedLyrics && item.duration)
-            .sort((a, b) => Math.abs(a.duration - ytDurationSeconds) - Math.abs(b.duration - ytDurationSeconds));
-
-          lrcData = syncedWithDuration[0] || null;
+        if (searchRes.status === 429) {
+          return NextResponse.json({ error: "LRCLIB rate limit reached." }, { status: 429 });
         }
 
-        // Fallback to first synced result
-        if (!lrcData) {
-          lrcData = searchResults.find((item: any) => item.syncedLyrics) || null;
+        const searchContentType = searchRes.headers.get("content-type") || "";
+
+        if (searchRes.ok && searchContentType.includes("application/json")) {
+          const searchResults: any[] = await searchRes.json();
+
+          if (ytDurationSeconds && searchResults.length > 0) {
+            const syncedWithDuration = searchResults
+              .filter((item: any) => item.syncedLyrics && item.duration)
+              .sort((a, b) => Math.abs(a.duration - ytDurationSeconds) - Math.abs(b.duration - ytDurationSeconds));
+
+            lrcData = syncedWithDuration[0] || null;
+          }
+
+          if (!lrcData) {
+            lrcData = searchResults.find((item: any) => item.syncedLyrics) || null;
+          }
         }
       }
+    } catch (fetchErr: any) {
+      if (fetchErr.name === "AbortError") {
+        return NextResponse.json(
+          { error: "LRCLIB took too long to respond. Please try again shortly." },
+          { status: 504 },
+        );
+      }
+      throw fetchErr;
     }
 
     if (!lrcData || !lrcData.syncedLyrics) {
@@ -184,23 +234,62 @@ export async function POST(req: NextRequest) {
     // 4. Load Kuromoji Tokenizer
     const tokenizer = await getTokenizer();
 
-    // 5. Tokenize, Romanize, Gloss & attach translation for each line
-    const processedLines: LyricLine[] = [];
+    // 5. Tokenize all lines into memory first
+    const tokenizedLines = rawLines.map((line) => {
+      const kuromojiTokens = tokenizer.tokenize(line.text);
+      return kuromojiTokens.map((t) => {
+        const isJp = isJapaneseText(t.surface_form);
 
-    for (let i = 0; i < rawLines.length; i++) {
-      const line = rawLines[i];
-      const tokens = await tokenizeLine(tokenizer, line.text);
+        if (t.pos === "記号" || !isJp) {
+          return {
+            surface: t.surface_form,
+            romaji: wanakana.toRomaji(t.surface_form),
+            meaning: "",
+            pos: mapPos(t.pos, t.pos_detail_1),
+            skip: true,
+            lookupWord: "",
+          };
+        }
 
-      processedLines.push({
-        id: `l${i + 1}`,
-        start: line.start,
-        end: line.end,
-        tokens,
-        translation: translations[i] || "",
+        const reading = t.reading && t.reading !== "*" ? t.reading : t.surface_form;
+        const romaji = wanakana.toRomaji(reading);
+        const lookupWord = t.basic_form && t.basic_form !== "*" ? t.basic_form : t.surface_form;
+
+        return {
+          surface: t.surface_form,
+          romaji,
+          meaning: "",
+          pos: mapPos(t.pos, t.pos_detail_1),
+          lookupWord,
+        };
       });
-    }
+    });
 
-    // 6. Construct track payload matching Track interface signature
+    // 6. Bulk pre-fetch all unique words from Jisho with concurrency (Fast & avoids timeouts)
+    const uniqueLookupWords = Array.from(
+      new Set(
+        tokenizedLines
+          .flat()
+          .filter((t) => !t.skip && t.lookupWord)
+          .map((t) => t.lookupWord),
+      ),
+    );
+
+    await prefetchJishoMeanings(uniqueLookupWords);
+
+    // 7. Map meanings back to tokens
+    const processedLines: LyricLine[] = tokenizedLines.map((tokens, i) => ({
+      id: `l${i + 1}`,
+      start: rawLines[i].start,
+      end: rawLines[i].end,
+      tokens: tokens.map(({ lookupWord, ...token }) => ({
+        ...token,
+        meaning: token.skip ? "" : meaningCache.get(lookupWord) || "(no definition found)",
+      })),
+      translation: translations[i] || "",
+    }));
+
+    // 8. Construct final track payload
     const outputId = slugify(title);
     const finalDurationSeconds = ytDurationSeconds || lrcData.duration;
     const duration = formatDuration(finalDurationSeconds);
@@ -227,7 +316,45 @@ export async function POST(req: NextRequest) {
   }
 }
 
-/** Parses basic LRC string into line objects with timestamps */
+/** Pre-fetches Jisho words in small concurrent batches (3 requests at a time with 150ms delay) */
+async function prefetchJishoMeanings(words: string[]) {
+  const uncached = words.filter((w) => !meaningCache.has(w));
+  if (uncached.length === 0) return;
+
+  const BATCH_SIZE = 3; // Keep concurrent requests low to avoid Jisho IP bans
+  for (let i = 0; i < uncached.length; i += BATCH_SIZE) {
+    const batch = uncached.slice(i, i + BATCH_SIZE);
+
+    await Promise.all(
+      batch.map(async (word) => {
+        let meaning = "";
+        try {
+          const res = await fetch(`https://jisho.org/api/v1/search/words?keyword=${encodeURIComponent(word)}`, {
+            headers: {
+              "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)",
+            },
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            const senses = data?.data?.[0]?.senses;
+            if (senses && senses.length > 0) {
+              meaning = senses[0].english_definitions?.join("; ") ?? "";
+            }
+          }
+        } catch {
+          // Graceful fallback
+        }
+
+        meaningCache.set(word, meaning || "(no definition found)");
+      }),
+    );
+
+    // Brief pause between batches
+    await new Promise((r) => setTimeout(r, 150));
+  }
+}
+
 function parseLrc(lrcText: string): Array<{ start: number; end: number; text: string }> {
   const lineRe = /^\[(\d+):(\d+(?:\.\d+)?)\](.*)$/;
   const parsed: Array<{ start: number; text: string }> = [];
@@ -251,47 +378,6 @@ function parseLrc(lrcText: string): Array<{ start: number; end: number; text: st
   }));
 }
 
-/** Tokenizes a single line of Japanese text */
-async function tokenizeLine(
-  tokenizer: kuromoji.Tokenizer<kuromoji.IpadicFeatures>,
-  text: string,
-): Promise<WordToken[]> {
-  const kuromojiTokens = tokenizer.tokenize(text);
-  const tokens: WordToken[] = [];
-
-  for (const t of kuromojiTokens) {
-    const isJp = isJapaneseText(t.surface_form);
-
-    // Skip dictionary lookup and interactive UI state for punctuation OR non-Japanese text
-    if (t.pos === "記号" || !isJp) {
-      tokens.push({
-        surface: t.surface_form,
-        romaji: wanakana.toRomaji(t.surface_form),
-        meaning: "",
-        pos: mapPos(t.pos, t.pos_detail_1),
-        skip: true,
-      });
-      continue;
-    }
-
-    const reading = t.reading && t.reading !== "*" ? t.reading : t.surface_form;
-    const romaji = wanakana.toRomaji(reading);
-    const lookupWord = t.basic_form && t.basic_form !== "*" ? t.basic_form : t.surface_form;
-
-    const meaning = await lookupMeaning(lookupWord);
-
-    tokens.push({
-      surface: t.surface_form,
-      romaji,
-      meaning,
-      pos: mapPos(t.pos, t.pos_detail_1),
-    });
-  }
-
-  return tokens;
-}
-
-/** Maps Japanese POS tags to simplified English labels */
 function mapPos(pos: string, detail: string): string {
   switch (pos) {
     case "名詞":
@@ -315,44 +401,6 @@ function mapPos(pos: string, detail: string): string {
     default:
       return detail && detail !== "*" ? detail : pos;
   }
-}
-
-/** Queries Jisho's REST API with in-memory caching and throttling */
-async function lookupMeaning(word: string): Promise<string> {
-  if (meaningCache.has(word)) {
-    return meaningCache.get(word)!;
-  }
-
-  let meaning = "";
-  try {
-    const res = await fetch(`https://jisho.org/api/v1/search/words?keyword=${encodeURIComponent(word)}`, {
-      headers: {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)",
-      },
-    });
-
-    const contentType = res.headers.get("content-type") || "";
-
-    if (res.ok && contentType.includes("application/json")) {
-      const data = await res.json();
-      const senses = data?.data?.[0]?.senses;
-      if (senses && senses.length > 0) {
-        meaning = senses[0].english_definitions?.join("; ") ?? "";
-      }
-    }
-  } catch {
-    // Graceful fallback on network glitch
-  }
-
-  if (!meaning) {
-    meaning = "(no definition found)";
-  }
-
-  meaningCache.set(word, meaning);
-
-  await new Promise((r) => setTimeout(r, JISHO_DELAY_MS));
-
-  return meaning;
 }
 
 function round2(n: number): number {
