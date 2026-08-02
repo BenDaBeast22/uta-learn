@@ -23,7 +23,7 @@ export default function Navbar({ userEmail }: NavbarProps) {
       <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
         {/* Brand Logo */}
         <Link href="/" className="font-mono text-xs uppercase tracking-[0.3em] text-gold hover:opacity-80 transition">
-          歌 — Uta Learn
+          歌学 — Uta Learn
         </Link>
 
         {/* Authenticated Navigation Links */}

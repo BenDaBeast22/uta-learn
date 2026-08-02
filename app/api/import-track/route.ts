@@ -3,8 +3,14 @@ import { Track, LyricLine } from "@/lib/types";
 import path from "node:path";
 import kuromoji from "kuromoji";
 import * as wanakana from "wanakana";
+import { createClient } from "@supabase/supabase-js";
 
 export const maxDuration = 60; // Max allowed runtime on Pro/Self-hosted Next.js
+
+// Initialize Supabase admin/service client for server-side cache checks
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabasePublishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || "";
+const supabase = createClient(supabaseUrl, supabasePublishableKey);
 
 // Default accent class for user-imported custom tracks
 const CUSTOM_ACCENT = "#8C86C9";
@@ -14,7 +20,7 @@ let tokenizerInstance: kuromoji.Tokenizer<kuromoji.IpadicFeatures> | null = null
 const meaningCache = new Map<string, string>();
 const LRCLIB_TIMEOUT_MS = 8000;
 
-// Identify your client properly according to LRCLIB rules
+// Identify client according to LRCLIB rules
 const LRCLIB_HEADERS = {
   "User-Agent": "uta-learn/1.0.0 (https://github.com/BenDaBeast22/uta-learn)",
   "Lrclib-Client": "uta-learn/1.0.0",
@@ -223,15 +229,60 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Both title and artist are required." }, { status: 400 });
     }
 
+    const trimmedTitle = title.trim();
+    const trimmedArtist = artist.trim();
     const youtubeId = extractYoutubeId(youtubeUrl);
+
+    // Fetch duration first so we can include it in the cache check
     const ytDurationSeconds = await getYoutubeDurationSeconds(youtubeId);
+
+    // =========================================================================
+    // SUPABASE CACHE LOOKUP (Includes duration tolerance check)
+    // =========================================================================
+    try {
+      let cacheQuery = supabase
+        .from("custom_tracks")
+        .select("track_data, youtube_url")
+        .ilike("title", trimmedTitle)
+        .ilike("artist", trimmedArtist);
+
+      const { data: cachedRows, error: cacheError } = await cacheQuery;
+
+      if (!cacheError && cachedRows && cachedRows.length > 0) {
+        // If duration is available, find a cached version within 3 seconds tolerance
+        const matchedRow = cachedRows.find((row) => {
+          const cachedTrack: Track = row.track_data;
+          if (!ytDurationSeconds || !cachedTrack.duration) return true;
+
+          const cachedDurationSec = parseDurationToSeconds(cachedTrack.duration);
+          return Math.abs(cachedDurationSec - ytDurationSeconds) <= 3;
+        });
+
+        if (matchedRow) {
+          const cachedTrack: Track = matchedRow.track_data;
+
+          // Attach YouTube ID if original didn't have one
+          if (youtubeId && !cachedTrack.youtubeId) {
+            cachedTrack.youtubeId = youtubeId;
+          }
+
+          return NextResponse.json({ track: cachedTrack, cached: true }, { status: 200 });
+        }
+      }
+    } catch (cacheFetchErr) {
+      console.warn("Supabase cache check failed, falling back to full import:", cacheFetchErr);
+    }
+
+    // =========================================================================
+    // CACHE MISS: RUN FULL IMPORT WORKFLOW
+    // =========================================================================
 
     // 1. Fetch synced lyrics from LRCLIB
     let lrcData: any = null;
 
     let getUrl = `https://lrclib.net/api/get?track_name=${encodeURIComponent(
-      title,
-    )}&artist_name=${encodeURIComponent(artist)}`;
+      trimmedTitle,
+    )}&artist_name=${encodeURIComponent(trimmedArtist)}`;
 
     if (ytDurationSeconds) {
       getUrl += `&duration=${ytDurationSeconds}`;
@@ -260,7 +311,7 @@ export async function POST(req: NextRequest) {
       if (getRes.ok && getContentType.includes("application/json")) {
         lrcData = await getRes.json();
       } else if (getRes.status === 404) {
-        const searchUrl = `https://lrclib.net/api/search?q=${encodeURIComponent(`${title} ${artist}`)}`;
+        const searchUrl = `https://lrclib.net/api/search?q=${encodeURIComponent(`${trimmedTitle} ${trimmedArtist}`)}`;
         const searchRes = await fetchWithTimeout(searchUrl, { headers: LRCLIB_HEADERS });
 
         if (searchRes.status === 429) {
@@ -327,7 +378,6 @@ export async function POST(req: NextRequest) {
           let formattedSurface = t.surface_form;
           const trimmed = t.surface_form.trim();
 
-          // Capitalize ONLY the first non-Japanese token word in the line ("new" -> "New")
           if (!hasSeenFirstNonJpWord && trimmed.length > 0) {
             formattedSurface = capitalizeFirstWord(t.surface_form);
             hasSeenFirstNonJpWord = true;
@@ -389,7 +439,6 @@ export async function POST(req: NextRequest) {
     const processedLines: LyricLine[] = tokenizedLines.map((tokens, i) => {
       let lineTranslation = translations[i] || "";
 
-      // Fallback: If translation empty/invalid AND it's strictly a 1-word line, use Jisho definition
       const interactiveTokens = tokens.filter((t) => !t.skip);
       if (!lineTranslation && interactiveTokens.length === 1) {
         const singleToken = interactiveTokens[0];
@@ -421,16 +470,16 @@ export async function POST(req: NextRequest) {
     });
 
     // 8. Construct final track payload
-    const outputId = slugify(title);
+    const outputId = slugify(trimmedTitle);
     const finalDurationSeconds = ytDurationSeconds || lrcData.duration;
     const duration = formatDuration(finalDurationSeconds);
-    const trackName = lrcData.trackName || title;
+    const trackName = lrcData.trackName || trimmedTitle;
 
     const track: Track = {
       id: outputId,
       title: trackName,
       titleRomaji: wanakana.toRomaji(trackName) || trackName,
-      artist: lrcData.artistName || artist,
+      artist: lrcData.artistName || trimmedArtist,
       level: "Custom",
       duration: duration || "0:00",
       youtubeId,
@@ -440,19 +489,19 @@ export async function POST(req: NextRequest) {
       isCustom: true,
     };
 
-    return NextResponse.json({ track }, { status: 200 });
+    return NextResponse.json({ track, cached: false }, { status: 200 });
   } catch (err: any) {
     console.error("Error in /api/import-track:", err);
     return NextResponse.json({ error: err.message || "An unexpected error occurred during import." }, { status: 500 });
   }
 }
 
-/** Pre-fetches Jisho words in small concurrent batches (3 requests at a time with 150ms delay) */
+/** Pre-fetches Jisho words in small concurrent batches */
 async function prefetchJishoMeanings(wordPairs: Array<{ lookupWord: string; surface: string }>) {
   const uncached = wordPairs.filter(({ lookupWord }) => !meaningCache.has(lookupWord));
   if (uncached.length === 0) return;
 
-  const BATCH_SIZE = 3; // Keep concurrent requests low to avoid Jisho IP bans
+  const BATCH_SIZE = 3;
   for (let i = 0; i < uncached.length; i += BATCH_SIZE) {
     const batch = uncached.slice(i, i + BATCH_SIZE);
 
@@ -474,7 +523,6 @@ async function prefetchJishoMeanings(wordPairs: Array<{ lookupWord: string; surf
             }
           }
 
-          // Secondary attempt using surface form if basic_form yielded nothing
           if (!meaning && surface && surface !== lookupWord) {
             res = await fetch(`https://jisho.org/api/v1/search/words?keyword=${encodeURIComponent(surface)}`, {
               headers: {
@@ -498,7 +546,6 @@ async function prefetchJishoMeanings(wordPairs: Array<{ lookupWord: string; surf
       }),
     );
 
-    // Brief pause between batches
     await new Promise((r) => setTimeout(r, 150));
   }
 }
@@ -560,6 +607,15 @@ function formatDuration(totalSeconds?: number): string {
   const m = Math.floor(totalSeconds / 60);
   const s = Math.round(totalSeconds % 60);
   return `${m}:${String(s).padStart(2, "0")}`;
+}
+
+function parseDurationToSeconds(durationStr: string): number {
+  if (!durationStr) return 0;
+  const parts = durationStr.split(":").map((p) => parseInt(p, 10));
+  if (parts.length === 2) {
+    return (parts[0] || 0) * 60 + (parts[1] || 0);
+  }
+  return 0;
 }
 
 function slugify(str: string): string {
