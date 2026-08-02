@@ -1,4 +1,4 @@
-export type Level = "Beginner" | "Intermediate" | "Advanced" | "";
+export type Level = "Beginner" | "Intermediate" | "Advanced" | "Custom";
 
 export interface WordToken {
   /** The word exactly as it appears in the lyric line (kanji/kana/punctuation) */
@@ -57,4 +57,4 @@ export interface SavedVocabItem {
   savedAt: number; // Date timestamp
 }
 
-export type LyricDisplayMode = "kanji" | "romaji" | "dual" | "english";
+export type LyricDisplayMode = "furigana" | "english" | "romaji" | "kanji";

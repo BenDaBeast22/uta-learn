@@ -2,30 +2,61 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import TrackPlayer from "@/components/TrackPlayer";
 import type { Track } from "@/lib/types";
-
-const STORAGE_KEY = "lingotrack_custom_tracks";
+import { createClient } from "@/lib/supabase/client";
 
 export default function CustomTrackLoader({ id }: { id: string }) {
   const [track, setTrack] = useState<Track | null>(null);
   const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const customTracks: Track[] = JSON.parse(saved);
-        const found = customTracks.find((t) => t.id === id);
-        if (found) {
-          setTrack(found);
+    async function fetchTrack() {
+      try {
+        setLoading(true);
+        setErrorMsg(null);
+
+        const supabase = createClient();
+        const targetId = decodeURIComponent(id);
+
+        const { data, error } = await supabase
+          .from("custom_tracks")
+          .select("id, track_data")
+          .eq("id", targetId)
+          .single();
+
+        if (error) {
+          console.error("Supabase fetch error:", error.message);
+          setErrorMsg(error.message);
+          setTrack(null);
+          return;
         }
+
+        if (data && data.track_data) {
+          const loadedTrack: Track = {
+            ...data.track_data,
+            id: data.id,
+            isCustom: true,
+          };
+          setTrack(loadedTrack);
+        } else {
+          setTrack(null);
+        }
+      } catch (err: unknown) {
+        console.error("Failed to load track from Supabase:", err);
+        if (err instanceof Error) {
+          setErrorMsg(err.message);
+        } else {
+          setErrorMsg("An unexpected error occurred while fetching the track.");
+        }
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error("Failed to read custom track from localStorage", err);
-    } finally {
-      setLoading(false);
+    }
+
+    if (id) {
+      fetchTrack();
     }
   }, [id]);
 
@@ -33,14 +64,27 @@ export default function CustomTrackLoader({ id }: { id: string }) {
     return (
       <main className="mx-auto max-w-6xl px-6 py-12 sm:py-16">
         <div className="flex justify-center items-center min-h-[300px]">
-          <span className="font-mono text-xs text-gold animate-pulse">Loading custom track...</span>
+          <span className="font-mono text-xs text-gold animate-pulse">Loading custom track from database...</span>
         </div>
       </main>
     );
   }
 
   if (!track) {
-    notFound();
+    return (
+      <main className="mx-auto max-w-6xl px-6 py-12 sm:py-16 text-center">
+        <h1 className="font-display text-2xl text-paper mb-4">Track Not Found</h1>
+        <p className="text-sm text-paper/60 mb-6">
+          {errorMsg || "This custom track couldn't be found in your database library."}
+        </p>
+        <Link
+          href="/my-tracks"
+          className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-gold hover:underline"
+        >
+          ← Return to My Tracks
+        </Link>
+      </main>
+    );
   }
 
   return (

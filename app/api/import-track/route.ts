@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Track, LyricLine, WordToken } from "@/lib/types";
+import { Track, LyricLine } from "@/lib/types";
 import path from "node:path";
 import kuromoji from "kuromoji";
 import * as wanakana from "wanakana";
@@ -20,9 +20,48 @@ const LRCLIB_HEADERS = {
   "Lrclib-Client": "uta-learn/1.0.0",
 };
 
+// Explicit particle dictionary using Jisho-style plain definitions.
+const PARTICLE_DEFINITIONS: Record<string, string> = {
+  て: "indicates continuous action or connects clauses (-te form)",
+  で: "indicates location of action, means, or method (at / by / with)",
+  に: "indicates direction, destination, time, or target (to / at / in)",
+  を: "indicates direct object of an action",
+  は: "indicates topic of a sentence",
+  が: "indicates subject of a sentence",
+  か: "indicates a question or alternative (or)",
+  の: "indicates possession or noun modification (of / 's)",
+  も: "indicates addition or inclusion (also / too / as well)",
+  と: "indicates togetherness or quotation (and / with)",
+  へ: "indicates direction or goal (towards / to)",
+  から: "indicates starting point or cause (from / because)",
+  まで: "indicates endpoint or limit (until / as far as)",
+  ね: "indicates request for confirmation (isn't it? / right?)",
+  よ: "indicates new information or emphasis (you know)",
+};
+
 // Helper: Check if string contains any Japanese characters
 function isJapaneseText(text: string): boolean {
   return /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/u.test(text);
+}
+
+// Helper: Capitalize first word of a sentence or text string ("new world" -> "New world")
+function capitalizeFirstWord(text: string): string {
+  if (!text || typeof text !== "string") return "";
+  const trimmed = text.trim();
+  if (!trimmed) return "";
+
+  return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
+}
+
+// Helper: Check if translation is exact Romaji phonetic echo
+function isTransliteration(translated: string, original: string): boolean {
+  if (!translated) return true;
+  const cleanTrans = translated.toLowerCase().replace(/[^a-z0-9]/g, "");
+  const romajiOrig = wanakana
+    .toRomaji(original)
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+  return cleanTrans === romajiOrig;
 }
 
 async function getTokenizer(): Promise<kuromoji.Tokenizer<kuromoji.IpadicFeatures>> {
@@ -75,46 +114,90 @@ async function getYoutubeDurationSeconds(youtubeId: string): Promise<number | nu
   return null;
 }
 
+// Clean & Direct Google GTX translation
+async function translateSingleLine(text: string): Promise<string> {
+  if (!text || !text.trim()) return "";
+
+  try {
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=ja&tl=en&dt=t&q=${encodeURIComponent(
+      text.trim(),
+    )}`;
+    const res = await fetch(url);
+    if (!res.ok) return "";
+    const data = await res.json();
+    if (!data || !data[0]) return "";
+
+    return data[0]
+      .map((c: any) => c[0] || "")
+      .join("")
+      .replace(/[.。]$/, "")
+      .trim();
+  } catch {
+    return "";
+  }
+}
+
 /** Robust Batch Translation using chunks to avoid HTTP 414 URL length limit */
 async function batchTranslateLines(lines: string[]): Promise<string[]> {
   if (lines.length === 0) return [];
 
-  // Break lines into chunks of 20 to avoid exceeding URL parameter limits
   const CHUNK_SIZE = 20;
   const results: string[] = [];
 
   for (let i = 0; i < lines.length; i += CHUNK_SIZE) {
     const chunk = lines.slice(i, i + CHUNK_SIZE);
-    const joinedText = chunk.join("\n");
 
-    try {
-      const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=ja&tl=en&dt=t&q=${encodeURIComponent(
-        joinedText,
-      )}`;
+    const translatedChunk = await Promise.all(
+      chunk.map(async (line) => {
+        const singleTrans = await translateSingleLine(line);
+        if (!singleTrans || isTransliteration(singleTrans, line)) {
+          return "";
+        }
+        return singleTrans;
+      }),
+    );
 
-      const res = await fetch(url);
-      if (!res.ok) {
-        results.push(...chunk.map(() => ""));
-        continue;
-      }
-
-      const data = await res.json();
-      if (!data || !data[0]) {
-        results.push(...chunk.map(() => ""));
-        continue;
-      }
-
-      const translatedText = data[0].map((c: any) => c[0] || "").join("");
-      const splitTranslated = translatedText.split("\n");
-
-      results.push(...splitTranslated);
-    } catch (err) {
-      console.error("Failed chunk translation:", err);
-      results.push(...chunk.map(() => ""));
-    }
+    results.push(...translatedChunk);
   }
 
   return results;
+}
+
+// Helper: Merge te-form, ta-form, and auxiliary verb endings into previous verb tokens
+function mergeVerbConjugations(tokens: any[]) {
+  const merged: any[] = [];
+
+  for (let i = 0; i < tokens.length; i++) {
+    const curr = tokens[i];
+    const prev = merged[merged.length - 1];
+
+    if (!prev) {
+      merged.push({ ...curr });
+      continue;
+    }
+
+    const isPrevVerb = prev.pos === "verb" || prev.rawPos === "動詞";
+    const isTeParticle =
+      (curr.rawPos === "助詞" || curr.pos === "particle") && (curr.surface === "て" || curr.surface === "で");
+    const isAuxiliary = curr.rawPos === "助動詞" || curr.pos === "auxiliary verb";
+
+    if (isPrevVerb && (isTeParticle || isAuxiliary)) {
+      prev.surface += curr.surface;
+      prev.romaji += curr.romaji;
+
+      if (isTeParticle) {
+        prev.conjugation = "te-form";
+      } else if (!prev.conjugation) {
+        prev.conjugation = "auxiliary / conjugated";
+      }
+
+      prev.baseForm = prev.lookupWord;
+    } else {
+      merged.push({ ...curr });
+    }
+  }
+
+  return merged;
 }
 
 async function fetchWithTimeout(url: string, options: RequestInit = {}, timeoutMs = LRCLIB_TIMEOUT_MS) {
@@ -157,7 +240,6 @@ export async function POST(req: NextRequest) {
     try {
       const getRes = await fetchWithTimeout(getUrl, { headers: LRCLIB_HEADERS });
 
-      // Handle LRCLIB Rate Limiting (429) & Capacity Errors (502, 503, 504)
       if (getRes.status === 429) {
         const retryAfter = getRes.headers.get("Retry-After") || "5";
         return NextResponse.json(
@@ -178,7 +260,6 @@ export async function POST(req: NextRequest) {
       if (getRes.ok && getContentType.includes("application/json")) {
         lrcData = await getRes.json();
       } else if (getRes.status === 404) {
-        // Direct match failed — attempt searching LRCLIB
         const searchUrl = `https://lrclib.net/api/search?q=${encodeURIComponent(`${title} ${artist}`)}`;
         const searchRes = await fetchWithTimeout(searchUrl, { headers: LRCLIB_HEADERS });
 
@@ -234,19 +315,43 @@ export async function POST(req: NextRequest) {
     // 4. Load Kuromoji Tokenizer
     const tokenizer = await getTokenizer();
 
-    // 5. Tokenize all lines into memory first
+    // 5. Tokenize all lines into memory
     const tokenizedLines = rawLines.map((line) => {
       const kuromojiTokens = tokenizer.tokenize(line.text);
-      return kuromojiTokens.map((t) => {
+      let hasSeenFirstNonJpWord = false;
+
+      const mapped = kuromojiTokens.map((t) => {
         const isJp = isJapaneseText(t.surface_form);
 
         if (t.pos === "記号" || !isJp) {
+          let formattedSurface = t.surface_form;
+          const trimmed = t.surface_form.trim();
+
+          // Capitalize ONLY the first non-Japanese token word in the line ("new" -> "New")
+          if (!hasSeenFirstNonJpWord && trimmed.length > 0) {
+            formattedSurface = capitalizeFirstWord(t.surface_form);
+            hasSeenFirstNonJpWord = true;
+          }
+
           return {
-            surface: t.surface_form,
+            surface: formattedSurface,
             romaji: wanakana.toRomaji(t.surface_form),
             meaning: "",
             pos: mapPos(t.pos, t.pos_detail_1),
+            rawPos: t.pos,
             skip: true,
+            lookupWord: "",
+          };
+        }
+
+        if (t.pos === "助詞" && PARTICLE_DEFINITIONS[t.surface_form]) {
+          return {
+            surface: t.surface_form,
+            romaji: wanakana.toRomaji(t.surface_form),
+            meaning: PARTICLE_DEFINITIONS[t.surface_form],
+            pos: "particle",
+            rawPos: t.pos,
+            skip: false,
             lookupWord: "",
           };
         }
@@ -260,34 +365,60 @@ export async function POST(req: NextRequest) {
           romaji,
           meaning: "",
           pos: mapPos(t.pos, t.pos_detail_1),
+          rawPos: t.pos,
+          skip: false,
           lookupWord,
         };
       });
+
+      return mergeVerbConjugations(mapped);
     });
 
-    // 6. Bulk pre-fetch all unique words from Jisho with concurrency (Fast & avoids timeouts)
-    const uniqueLookupWords = Array.from(
-      new Set(
-        tokenizedLines
-          .flat()
-          .filter((t) => !t.skip && t.lookupWord)
-          .map((t) => t.lookupWord),
-      ),
-    );
+    // 6. Bulk pre-fetch all unique words from Jisho
+    const uniqueWordMap = new Map<string, { lookupWord: string; surface: string }>();
+    tokenizedLines.flat().forEach((t) => {
+      if (!t.skip && t.lookupWord && !uniqueWordMap.has(t.lookupWord)) {
+        uniqueWordMap.set(t.lookupWord, { lookupWord: t.lookupWord, surface: t.surface });
+      }
+    });
 
-    await prefetchJishoMeanings(uniqueLookupWords);
+    const uniqueWordPairs = Array.from(uniqueWordMap.values());
+    await prefetchJishoMeanings(uniqueWordPairs);
 
     // 7. Map meanings back to tokens
-    const processedLines: LyricLine[] = tokenizedLines.map((tokens, i) => ({
-      id: `l${i + 1}`,
-      start: rawLines[i].start,
-      end: rawLines[i].end,
-      tokens: tokens.map(({ lookupWord, ...token }) => ({
-        ...token,
-        meaning: token.skip ? "" : meaningCache.get(lookupWord) || "(no definition found)",
-      })),
-      translation: translations[i] || "",
-    }));
+    const processedLines: LyricLine[] = tokenizedLines.map((tokens, i) => {
+      let lineTranslation = translations[i] || "";
+
+      // Fallback: If translation empty/invalid AND it's strictly a 1-word line, use Jisho definition
+      const interactiveTokens = tokens.filter((t) => !t.skip);
+      if (!lineTranslation && interactiveTokens.length === 1) {
+        const singleToken = interactiveTokens[0];
+        const jishoMeaning = singleToken.meaning || meaningCache.get(singleToken.lookupWord) || "";
+        lineTranslation = jishoMeaning.split(";")[0].trim();
+      }
+
+      lineTranslation = capitalizeFirstWord(lineTranslation);
+      const rawText = capitalizeFirstWord(rawLines[i].text);
+
+      return {
+        id: `l${i + 1}`,
+        start: rawLines[i].start,
+        end: rawLines[i].end,
+        text: rawText,
+        tokens: tokens.map(({ lookupWord, rawPos, baseForm, conjugation, ...token }) => {
+          if (token.meaning) return token;
+
+          return {
+            ...token,
+            lookupWord,
+            baseForm: baseForm || (token.skip ? "" : lookupWord),
+            conjugation: conjugation || null,
+            meaning: token.skip ? "" : meaningCache.get(lookupWord) || "(no dictionary match — fill in manually)",
+          };
+        }),
+        translation: lineTranslation,
+      };
+    });
 
     // 8. Construct final track payload
     const outputId = slugify(title);
@@ -300,7 +431,7 @@ export async function POST(req: NextRequest) {
       title: trackName,
       titleRomaji: wanakana.toRomaji(trackName) || trackName,
       artist: lrcData.artistName || artist,
-      level: "",
+      level: "Custom",
       duration: duration || "0:00",
       youtubeId,
       accent: CUSTOM_ACCENT,
@@ -317,8 +448,8 @@ export async function POST(req: NextRequest) {
 }
 
 /** Pre-fetches Jisho words in small concurrent batches (3 requests at a time with 150ms delay) */
-async function prefetchJishoMeanings(words: string[]) {
-  const uncached = words.filter((w) => !meaningCache.has(w));
+async function prefetchJishoMeanings(wordPairs: Array<{ lookupWord: string; surface: string }>) {
+  const uncached = wordPairs.filter(({ lookupWord }) => !meaningCache.has(lookupWord));
   if (uncached.length === 0) return;
 
   const BATCH_SIZE = 3; // Keep concurrent requests low to avoid Jisho IP bans
@@ -326,10 +457,10 @@ async function prefetchJishoMeanings(words: string[]) {
     const batch = uncached.slice(i, i + BATCH_SIZE);
 
     await Promise.all(
-      batch.map(async (word) => {
+      batch.map(async ({ lookupWord, surface }) => {
         let meaning = "";
         try {
-          const res = await fetch(`https://jisho.org/api/v1/search/words?keyword=${encodeURIComponent(word)}`, {
+          let res = await fetch(`https://jisho.org/api/v1/search/words?keyword=${encodeURIComponent(lookupWord)}`, {
             headers: {
               "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)",
             },
@@ -342,11 +473,28 @@ async function prefetchJishoMeanings(words: string[]) {
               meaning = senses[0].english_definitions?.join("; ") ?? "";
             }
           }
+
+          // Secondary attempt using surface form if basic_form yielded nothing
+          if (!meaning && surface && surface !== lookupWord) {
+            res = await fetch(`https://jisho.org/api/v1/search/words?keyword=${encodeURIComponent(surface)}`, {
+              headers: {
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)",
+              },
+            });
+
+            if (res.ok) {
+              const data = await res.json();
+              const senses = data?.data?.[0]?.senses;
+              if (senses && senses.length > 0) {
+                meaning = senses[0].english_definitions?.join("; ") ?? "";
+              }
+            }
+          }
         } catch {
           // Graceful fallback
         }
 
-        meaningCache.set(word, meaning || "(no definition found)");
+        meaningCache.set(lookupWord, meaning || "(no dictionary match — fill in manually)");
       }),
     );
 

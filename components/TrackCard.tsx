@@ -43,11 +43,6 @@ export default function TrackCard({ track, index, onDelete }: TrackCardProps) {
         <div className="mb-4 flex items-center justify-between">
           <span className="font-mono text-xs tracking-widest text-paper/40">{String(index + 1).padStart(2, "0")}</span>
           <div className="flex items-center gap-2">
-            {track.isCustom && (
-              <span className="rounded bg-purple-500/10 px-2 py-0.5 font-mono text-[0.65rem] uppercase tracking-wider text-purple-300 border border-purple-500/20">
-                Custom
-              </span>
-            )}
             <span
               className="rounded-full border px-2.5 py-0.5 font-mono text-[0.65rem] uppercase tracking-wider"
               style={{ borderColor: `${track.accent}66`, color: track.accent }}

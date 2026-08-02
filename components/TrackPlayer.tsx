@@ -8,7 +8,7 @@ import LyricsPanel from "./LyricsPanel";
 
 export default function TrackPlayer({ track }: { track: Track }) {
   const [currentTime, setCurrentTime] = useState(0);
-  const [displayMode, setDisplayMode] = useState<LyricDisplayMode>("kanji");
+  const [displayMode, setDisplayMode] = useState<LyricDisplayMode>("furigana");
   const playerRef = useRef<any>(null);
 
   function handleSeek(seconds: number) {
@@ -36,9 +36,9 @@ export default function TrackPlayer({ track }: { track: Track }) {
           <span className="font-mono text-xs text-paper/70">Lyric View:</span>
           <div className="flex flex-wrap gap-1 rounded-full bg-black/30 p-1 border border-paper/10">
             <button
-              onClick={() => setDisplayMode("dual")}
+              onClick={() => setDisplayMode("furigana")}
               className={`rounded-full px-3 py-1 font-mono text-xs transition ${
-                displayMode === "dual" ? "bg-gold text-black font-semibold" : "text-paper/60 hover:text-paper"
+                displayMode === "furigana" ? "bg-gold text-black font-semibold" : "text-paper/60 hover:text-paper"
               }`}
             >
               Readings

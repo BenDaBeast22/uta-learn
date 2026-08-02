@@ -6,11 +6,13 @@ import TrackCard from "@/components/TrackCard";
 import type { Track } from "@/lib/types";
 import { createClient } from "@/lib/supabase/client";
 
-export default function MyTracksPage() {
-  const supabase = createClient();
+// Instantiate Supabase client outside the render cycle
+const supabase = createClient();
 
+export default function MyTracksPage() {
   const [user, setUser] = useState<any>(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const [tracksLoading, setTracksLoading] = useState(true);
 
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
@@ -22,8 +24,9 @@ export default function MyTracksPage() {
   const [tracks, setTracks] = useState<Track[]>([]);
 
   // 1. Fetch user & load their custom tracks from Supabase
-  const loadUserTracks = useCallback(
-    async (userId: string) => {
+  const loadUserTracks = useCallback(async (userId: string) => {
+    try {
+      setTracksLoading(true);
       const { data, error } = await supabase
         .from("custom_tracks")
         .select("id, track_data")
@@ -38,14 +41,15 @@ export default function MyTracksPage() {
       if (data) {
         const parsedTracks: Track[] = data.map((row) => ({
           ...row.track_data,
-          id: row.id, // Use Supabase row UUID as track ID
+          id: row.id, // Ensure Supabase row UUID is used as the primary track ID
           isCustom: true,
         }));
         setTracks(parsedTracks);
       }
-    },
-    [supabase],
-  );
+    } finally {
+      setTracksLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     async function checkUser() {
@@ -58,11 +62,13 @@ export default function MyTracksPage() {
 
       if (currentUser) {
         await loadUserTracks(currentUser.id);
+      } else {
+        setTracksLoading(false);
       }
     }
 
     checkUser();
-  }, [supabase, loadUserTracks]);
+  }, [loadUserTracks]);
 
   // 2. Delete track from Supabase
   const handleDeleteTrack = async (trackId: string, trackTitle: string) => {
@@ -76,7 +82,7 @@ export default function MyTracksPage() {
 
     if (error) {
       console.error("Failed to delete track from Supabase:", error.message);
-      // Revert if error
+      // Revert on failure
       await loadUserTracks(user.id);
     }
   };
@@ -107,20 +113,18 @@ export default function MyTracksPage() {
       });
 
       const contentType = res.headers.get("content-type") || "";
-
       if (!contentType.includes("application/json")) {
         throw new Error(`Server returned an invalid response (${res.status}). Check server logs.`);
       }
 
       const data = await res.json();
-
       if (!res.ok) {
         throw new Error(data.error || "Failed to import track.");
       }
 
-      const importedTrack: Track = { ...data.track, isCustom: true };
+      const rawTrack = data.track;
 
-      // Save row to Supabase custom_tracks table
+      // 1. Insert initial row to retrieve generated Supabase UUID
       const { data: dbData, error: dbError } = await supabase
         .from("custom_tracks")
         .insert({
@@ -128,7 +132,7 @@ export default function MyTracksPage() {
           title: title.trim(),
           artist: artist.trim(),
           youtube_url: youtubeUrl.trim() || null,
-          track_data: importedTrack,
+          track_data: { ...rawTrack, isCustom: true },
         })
         .select("id")
         .single();
@@ -137,8 +141,16 @@ export default function MyTracksPage() {
         throw new Error(`Failed to save track to database: ${dbError.message}`);
       }
 
-      // Add new track with its DB assigned ID
-      const finalTrack: Track = { ...importedTrack, id: dbData.id };
+      // 2. Sync UUID inside track payload
+      const finalTrack: Track = {
+        ...rawTrack,
+        id: dbData.id,
+        isCustom: true,
+      };
+
+      // 3. Update row so embedded track_data matches the assigned ID
+      await supabase.from("custom_tracks").update({ track_data: finalTrack }).eq("id", dbData.id);
+
       setTracks((prev) => [finalTrack, ...prev]);
 
       // Reset form
@@ -312,8 +324,9 @@ export default function MyTracksPage() {
           </span>
         </div>
 
-        {/* Empty State */}
-        {tracks.length === 0 ? (
+        {tracksLoading ? (
+          <div className="py-12 text-center font-mono text-xs text-gold animate-pulse">Loading your library...</div>
+        ) : tracks.length === 0 ? (
           <div className="rounded-xl border border-dashed border-paper/10 bg-paper/5 p-12 text-center">
             <p className="font-display text-xl text-paper">No custom tracks imported yet</p>
             <p className="mt-2 font-body text-sm text-paper/60">
@@ -323,7 +336,6 @@ export default function MyTracksPage() {
             </p>
           </div>
         ) : (
-          /* Track Grid */
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {tracks.map((track, i) => (
               <TrackCard key={track.id} track={track} index={i} onDelete={handleDeleteTrack} />
