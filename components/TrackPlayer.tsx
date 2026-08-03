@@ -82,13 +82,13 @@ export default function TrackPlayer({ track }: { track: Track }) {
         />
 
         {/* Display Mode Toggle */}
-        <div className="rounded-lg border border-paper/10 bg-paper/5 p-3">
-          <div className="flex flex-wrap items-center gap-7">
-            <span className="font-mono text-xs text-paper/70">Lyric View:</span>
-            <div className="flex flex-wrap gap-1 rounded-full border border-paper/10 bg-black/30 p-1">
+        <div className="rounded-lg border border-paper/10 bg-paper/5 p-1 py-3 sm:p-3">
+          <div className="flex flex-wrap items-center sm:gap-7 gap-2">
+            <span className="font-mono text-xs text-paper/70 ml-2 mb-1">Lyric View:</span>
+            <div className="flex flex-wrap sm:gap-1 rounded-full border border-paper/10 bg-black/30 p-1">
               <button
                 onClick={() => setDisplayMode("furigana")}
-                className={`rounded-full px-3 py-1 font-mono text-xs transition ${
+                className={`rounded-full px-3 py-1 font-mono text-[10px] sm:text-xs transition ${
                   displayMode === "furigana" ? "bg-gold font-semibold text-black" : "text-paper/60 hover:text-paper"
                 }`}
               >
@@ -96,7 +96,7 @@ export default function TrackPlayer({ track }: { track: Track }) {
               </button>
               <button
                 onClick={() => setDisplayMode("english")}
-                className={`rounded-full px-3 py-1 font-mono text-xs transition ${
+                className={`rounded-full px-3 py-1 font-mono text-[10px] sm:text-xs transition ${
                   displayMode === "english" ? "bg-gold font-semibold text-black" : "text-paper/60 hover:text-paper"
                 }`}
               >
@@ -104,7 +104,7 @@ export default function TrackPlayer({ track }: { track: Track }) {
               </button>
               <button
                 onClick={() => setDisplayMode("romaji")}
-                className={`rounded-full px-3 py-1 font-mono text-xs transition ${
+                className={`rounded-full px-3 py-1 font-mono text-[10px] sm:text-xs transition ${
                   displayMode === "romaji" ? "bg-gold font-semibold text-black" : "text-paper/60 hover:text-paper"
                 }`}
               >
@@ -112,7 +112,7 @@ export default function TrackPlayer({ track }: { track: Track }) {
               </button>
               <button
                 onClick={() => setDisplayMode("kanji")}
-                className={`rounded-full px-3 py-1 font-mono text-xs transition ${
+                className={`rounded-full px-3 py-1 font-mono text-[10px]  sm:text-xs transition ${
                   displayMode === "kanji" ? "bg-gold font-semibold text-black" : "text-paper/60 hover:text-paper"
                 }`}
               >
@@ -122,7 +122,7 @@ export default function TrackPlayer({ track }: { track: Track }) {
           </div>
 
           {/* Active Mode Explanation Line - Left-aligned */}
-          <div className="mt-2.5 flex items-center gap-1.5 font-mono text-[11px] text-gold/80">
+          <div className="mt-2.5 ml-2 flex items-center gap-1.5 font-mono text-[11px] text-gold/80">
             <span>•</span>
             <p>{MODE_DESCRIPTIONS[displayMode]}</p>
           </div>
