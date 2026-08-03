@@ -2,8 +2,10 @@
 
 import { useRef, useState, useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
+import Link from "next/link";
 import { WordToken as WordTokenData, LyricDisplayMode } from "@/lib/types";
 import { useVocabStore } from "@/hooks/useVocabStore";
+import { createClient } from "@/lib/supabase/client";
 
 const POPOVER_WIDTH = 208;
 const POPOVER_EST_HEIGHT = 180;
@@ -34,8 +36,14 @@ export default function WordToken({
   const [isHovered, setIsHovered] = useState(false);
   const [coords, setCoords] = useState<{ left: number; top: number; flip: boolean } | null>(null);
 
+  // Auth states
+  const [user, setUser] = useState<any>(null);
+  const [showAuthWarning, setShowAuthWarning] = useState(false);
+
   const triggerRef = useRef<HTMLSpanElement>(null);
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const supabase = useMemo(() => createClient(), []);
 
   // Derive target dictionary headword (e.g., "変える" over "変えて")
   const headword = token.baseForm || token.surface;
@@ -49,13 +57,23 @@ export default function WordToken({
     return vocab.some((v) => v.token.surface === headword || v.token.baseForm === headword);
   }, [vocab, isLoaded, headword]);
 
+  // Check auth state on mount
   useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data.user);
+    });
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
     return () => {
+      authListener.subscription.unsubscribe();
       if (closeTimeoutRef.current) {
         clearTimeout(closeTimeoutRef.current);
       }
     };
-  }, []);
+  }, [supabase]);
 
   const isJp = isJapaneseText(token.surface);
   if (token.skip || !isJp) {
@@ -106,11 +124,19 @@ export default function WordToken({
 
     closeTimeoutRef.current = setTimeout(() => {
       setOpen(false);
+      setShowAuthWarning(false); // Reset warning state when tooltip hides
     }, 120);
   }
 
   const handleToggleSave = (e: React.MouseEvent) => {
     e.stopPropagation();
+
+    // Check if user is authenticated
+    if (!user) {
+      setShowAuthWarning(true);
+      return;
+    }
+
     if (saved) {
       removeVocab(headword);
     } else {
@@ -231,17 +257,31 @@ export default function WordToken({
                 </span>
               )}
 
-              {/* Action Button */}
+              {/* Action Area */}
               <div className="mt-2.5 border-t border-ink/10 pt-2">
-                <button
-                  type="button"
-                  onClick={handleToggleSave}
-                  className={`flex w-full items-center justify-center gap-1.5 rounded-md px-2 py-1 font-mono text-[0.7rem] font-medium transition ${
-                    saved ? "bg-seal/10 text-seal hover:bg-seal/20" : "bg-ink text-paper hover:bg-gold hover:text-ink"
-                  }`}
-                >
-                  {saved ? `✓ Saved "${headword}" to vocab` : `Add "${headword}" to Vocab`}
-                </button>
+                {showAuthWarning ? (
+                  <div className="rounded border border-red-900/30 bg-red-500/10 p-2 space-y-1.5">
+                    <p className="font-body text-[0.68rem] font-medium leading-tight text-red-900">
+                      Sign in to save words to your vocabulary list.
+                    </p>
+                    <Link
+                      href="/login?mode=signup"
+                      className="flex w-full items-center justify-center rounded bg-seal px-2 py-1 font-mono text-[0.65rem] font-semibold text-paper transition hover:opacity-90"
+                    >
+                      Create Account →
+                    </Link>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleToggleSave}
+                    className={`flex w-full items-center justify-center gap-1.5 rounded-md px-2 py-1 font-mono text-[0.7rem] font-medium transition ${
+                      saved ? "bg-seal/10 text-seal hover:bg-seal/20" : "bg-ink text-paper hover:bg-gold hover:text-ink"
+                    }`}
+                  >
+                    {saved ? `✓ Saved "${headword}" to vocab` : `Add "${headword}" to Vocab`}
+                  </button>
+                )}
               </div>
 
               {/* Tail pointing toward word */}

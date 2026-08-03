@@ -149,13 +149,6 @@ export default function LoginPage() {
           >
             Continue with Google
           </button>
-          <button
-            type="button"
-            onClick={() => handleOAuthSignIn("apple")}
-            className="w-full rounded-full border border-paper/20 py-2 font-mono text-xs text-paper transition hover:border-paper/40"
-          >
-            Continue with Apple
-          </button>
         </div>
 
         {/* Toggle Mode */}
