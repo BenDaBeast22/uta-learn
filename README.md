@@ -67,8 +67,7 @@ You can type this by hand, or generate most of it — see below.
 ## Importing lyrics
 
 ```bash
-npm run dev                                             # terminal 1
-npm run import-lyrics -- "Mirage" "Creepy Nuts" mirage   # terminal 2
+npm run import-lyrics -- "Mirage" "Creepy Nuts" mirage [--duration=2:19]   # terminal 2
 ```
 
 This fetches synced lyrics from [LRCLIB](https://lrclib.net) (via
@@ -80,6 +79,7 @@ in another terminal since it calls your local API route. The third argument
 is optional — it defaults to a slugified track name.
 
 It writes, to `data/imports/`:
+
 - `mirage.json` — raw line timestamps + text
 - `mirage.tokens.json` — same, tokenized
 - `mirage.lyrics.generated.ts` — a `LyricLine[]` ready to import
@@ -93,6 +93,7 @@ import { generatedLyrics } from "./imports/mirage.lyrics.generated";
 ```
 
 **Treat the output as a first draft.** Known rough edges:
+
 - は and へ come back romanized as "ha"/"he" even when used as the
   wa/e-pronounced particles — fix these by hand.
 - `"(no dictionary match — fill in manually)"` shows up when Jisho has
@@ -120,6 +121,7 @@ copyrighted lyrics text.
 ## Notes on scope
 
 A starting point, not a full product. Likely next steps:
+
 - A database instead of the static `data/tracks.ts` file
 - A lyrics-timing editor UI instead of hand-editing JSON
 - User accounts and progress tracking

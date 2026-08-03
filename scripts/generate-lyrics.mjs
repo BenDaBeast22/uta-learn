@@ -1,3 +1,15 @@
+#!/usr/bin/env node
+/**
+ * Usage:
+ *   node scripts/generate-lyrics.mjs "<songName>" "<artist>" [duration] [output]
+ *   npm run generate-lyrics "<songName>" "<artist>" [duration] [output]
+ *
+ * Examples:
+ *   npm run generate-lyrics "New World" "ado"
+ *   npm run generate-lyrics "mirage" "creepy nuts" 3:45
+ *   npm run generate-lyrics "mirage" "creepy nuts" 3:45 mirage
+ */
+
 import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
@@ -96,22 +108,18 @@ function parseDurationToSeconds(durationStr) {
   return isNaN(rawSeconds) ? null : rawSeconds;
 }
 
-// Parse CLI Arguments
-const args = process.argv.slice(2);
-if (args.length < 2) {
-  console.error('Usage: node scripts/generate-lyrics.mjs "<songName>" "<artist>" [--duration=1:30]');
+// Parse CLI Arguments strictly by position
+const positionalArgs = process.argv.slice(2);
+
+if (positionalArgs.length < 2) {
+  console.error('Usage: node scripts/generate-lyrics.mjs "<songName>" "<artist>" [duration] [output]');
   process.exit(1);
 }
 
-const songName = args[0];
-const artist = args[1];
-
-let durationInSeconds = null;
-const durationOpt = args.find((arg) => arg.startsWith("--duration="));
-if (durationOpt) {
-  const durationVal = durationOpt.split("=")[1];
-  durationInSeconds = parseDurationToSeconds(durationVal);
-}
+const songName = positionalArgs[0];
+const artist = positionalArgs[1];
+const durationInSeconds = positionalArgs[2] ? parseDurationToSeconds(positionalArgs[2]) : null;
+const customOutputName = positionalArgs[3] ? positionalArgs[3].trim() : null;
 
 // Helper: Kuromoji Initializer
 function getTokenizer() {
@@ -362,7 +370,10 @@ async function prefetchJishoMeanings(wordPairs) {
 
   for (let i = 0; i < uncached.length; i++) {
     const { lookupWord, surface } = uncached[i];
-    process.stdout.write(`   Fetching dictionary definitions: ${i + 1}/${uncached.length} ("${lookupWord}")\r`);
+
+    process.stdout.clearLine?.(0);
+    process.stdout.cursorTo?.(0);
+    process.stdout.write(`   Fetching dictionary definitions: ${i + 1}/${uncached.length} ("${lookupWord}")`);
 
     let meaning = await fetchJishoWithRetry(lookupWord);
 
@@ -372,7 +383,6 @@ async function prefetchJishoMeanings(wordPairs) {
 
     meaningCache.set(lookupWord, meaning || "(no dictionary match — fill in manually)");
 
-    // Delay between consecutive API calls to respect ~1 req/sec limit
     if (i < uncached.length - 1) {
       await new Promise((r) => setTimeout(r, JISHO_DELAY_MS));
     }
@@ -391,7 +401,12 @@ function camelCase(str) {
 }
 
 function slugify(str) {
-  return str
+  if (!str) return "";
+
+  // Only convert Japanese text to Romaji if it actually contains Japanese characters
+  const normalizedStr = isJapaneseText(str) ? wanakana.toRomaji(str) : str;
+
+  return normalizedStr
     .toLowerCase()
     .normalize("NFKD")
     .replace(/[^\w\s-]/g, "")
@@ -509,9 +524,6 @@ async function main() {
     // Capitalize translation line
     lineTranslation = capitalizeFirstWord(lineTranslation);
 
-    // Format raw text so only the first word is capitalized ("new world" -> "New world")
-    const rawText = capitalizeFirstWord(rawLines[i].text);
-
     return {
       id: `l${i + 1}`,
       start: rawLines[i].start,
@@ -534,9 +546,16 @@ async function main() {
   console.log("✅ Tokenization and translation complete.");
 
   // Output formatting & file generation
-  const camelSongName = camelCase(slugify(songName));
-  const exportVarName = `${camelSongName}Lyrics`;
-  const fileSlug = slugify(songName);
+  let fileSlug = "";
+  if (customOutputName) {
+    fileSlug = slugify(customOutputName);
+  } else {
+    fileSlug = slugify(songName) || "lyrics-output";
+  }
+  console.log("customOutputName = ", customOutputName);
+  console.log("file slug = ", fileSlug);
+  const camelName = camelCase(fileSlug) || "songLyrics";
+  const exportVarName = `${camelName}Lyrics`;
 
   const outputDir = path.join(process.cwd(), "data", "imports");
   if (!fs.existsSync(outputDir)) {

@@ -11,12 +11,19 @@ export default function TrackPlayer({ track }: { track: Track }) {
   const [displayMode, setDisplayMode] = useState<LyricDisplayMode>("furigana");
   const playerRef = useRef<any>(null);
 
+  // Calculate adjusted time taking into account the track's offset
+  const offset = track.lyricsOffset ?? 0;
+  const adjustedTime = currentTime - offset;
+
   function handleSeek(seconds: number) {
     const player = playerRef.current;
     if (!player) return;
-    player.seekTo(seconds, true);
+
+    // When seeking from a line click, add back the offset so the video seeks correctly
+    const targetVideoTime = seconds + offset;
+    player.seekTo(targetVideoTime, true);
     player.playVideo();
-    setCurrentTime(seconds);
+    setCurrentTime(targetVideoTime);
   }
 
   return (
@@ -80,7 +87,7 @@ export default function TrackPlayer({ track }: { track: Track }) {
       <LyricsPanel
         songTitle={track.title}
         lyrics={track.lyrics}
-        currentTime={currentTime}
+        currentTime={adjustedTime}
         accent={track.accent}
         displayMode={displayMode}
         onLineClick={handleSeek}

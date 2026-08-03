@@ -13,11 +13,11 @@ interface TrackCardProps {
 }
 
 export default function TrackCard({ track, index, onDelete }: TrackCardProps) {
-  // 1. Set preferred high-res URL as initial state
-  const highResUrl = `https://i.ytimg.com/vi/${track.youtubeId}/hq720.jpg`;
+  // Determine initial thumbnail URL: custom thumbnail first, then YouTube hq720
+  const initialUrl = track.customThumbnail || `https://i.ytimg.com/vi/${track.youtubeId}/hq720.jpg`;
   const fallbackUrl = `https://i.ytimg.com/vi/${track.youtubeId}/hqdefault.jpg`;
 
-  const [imgSrc, setImgSrc] = useState(highResUrl);
+  const [imgSrc, setImgSrc] = useState(initialUrl);
   const [isFallback, setIsFallback] = useState(false);
 
   // Custom tracks live under /my-tracks/[id], curated tracks under /track/[id]
@@ -59,9 +59,9 @@ export default function TrackCard({ track, index, onDelete }: TrackCardProps) {
             alt={`${track.title} thumbnail`}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            // Switch to fallback URL if 404
+            // Switch to YouTube fallback URL if 404 (and not already using custom thumbnail)
             onError={() => {
-              if (!isFallback) {
+              if (!isFallback && !track.customThumbnail) {
                 setImgSrc(fallbackUrl);
                 setIsFallback(true);
               }
@@ -74,7 +74,7 @@ export default function TrackCard({ track, index, onDelete }: TrackCardProps) {
         </div>
 
         <h2 className="font-display text-2xl leading-snug text-paper">{track.title}</h2>
-        <p className="mt-1 font-mono text-sm text-paper/50">{track.titleRomaji}</p>
+        {<p className="mt-1 font-mono text-sm text-paper/50">{track.artist}</p>}
         <p className="mt-4 text-sm leading-relaxed text-paper/70">{track.summary}</p>
       </div>
 

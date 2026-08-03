@@ -36,7 +36,7 @@ export interface LyricLine {
 export interface Track {
   id: string;
   title: string;
-  titleRomaji: string;
+  titleRomaji?: string;
   artist: string;
   level: Level;
   duration: string;
@@ -47,6 +47,8 @@ export interface Track {
   summary: string;
   lyrics: LyricLine[];
   isCustom?: boolean;
+  customThumbnail?: string;
+  lyricsOffset?: number; // num ms to delay yt lyrics to sync with youtube vid
 }
 
 export interface SavedVocabItem {
