@@ -23,7 +23,7 @@ export default async function TrackPage({ params }: PageProps) {
   }
 
   return (
-    <main className="mx-auto max-w-6xl px-6 py-12 sm:py-16">
+    <main className="mx-auto max-w-6xl px-6 py-10 sm:py-12">
       <Link
         href="/"
         className="mb-8 inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-paper/50 transition-colors hover:text-gold"

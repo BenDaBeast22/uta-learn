@@ -10,7 +10,7 @@ export default async function TracksPage() {
   } = await supabase.auth.getUser();
 
   return (
-    <main className="mx-auto max-w-5xl px-6 py-12 sm:py-16">
+    <main className="mx-auto max-w-5xl px-6 py-10 sm:py-12">
       <header className="seam mb-10 pl-5">
         <div className="flex items-center gap-2">
           <span className="rounded border border-gold/20 bg-gold/10 px-2 py-0.5 font-mono text-[10px] uppercase text-gold">

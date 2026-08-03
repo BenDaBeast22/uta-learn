@@ -171,7 +171,7 @@ export default function MyTracksPage() {
   };
 
   return (
-    <main className="mx-auto max-w-5xl px-6 py-12 sm:py-16">
+    <main className="mx-auto max-w-5xl px-6 py-10 sm:py-12">
       {/* Page Header */}
       <header className="seam mb-12 pl-5">
         <div className="flex items-center gap-2">

@@ -83,7 +83,7 @@ export default function MyVocabPage() {
 
   if (!isLoaded) {
     return (
-      <main className="mx-auto max-w-5xl px-6 py-12 sm:py-16">
+      <main className="mx-auto max-w-5xl px-6 py-10 sm:py-12">
         <div className="text-center font-mono text-sm text-paper/40">Loading vocabulary from Supabase...</div>
       </main>
     );

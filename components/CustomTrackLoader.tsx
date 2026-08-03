@@ -62,7 +62,7 @@ export default function CustomTrackLoader({ id }: { id: string }) {
 
   if (loading) {
     return (
-      <main className="mx-auto max-w-6xl px-6 py-12 sm:py-16">
+      <main className="mx-auto max-w-6xl px-6 py-12 sm:py-12">
         <div className="flex justify-center items-center min-h-[300px]">
           <span className="font-mono text-xs text-gold animate-pulse">Loading custom track from database...</span>
         </div>
@@ -72,7 +72,7 @@ export default function CustomTrackLoader({ id }: { id: string }) {
 
   if (!track) {
     return (
-      <main className="mx-auto max-w-6xl px-6 py-12 sm:py-16 text-center">
+      <main className="mx-auto max-w-6xl px-6 py-12 sm:py-12 text-center">
         <h1 className="font-display text-2xl text-paper mb-4">Track Not Found</h1>
         <p className="text-sm text-paper/60 mb-6">
           {errorMsg || "This custom track couldn't be found in your database library."}
@@ -88,7 +88,7 @@ export default function CustomTrackLoader({ id }: { id: string }) {
   }
 
   return (
-    <main className="mx-auto max-w-6xl px-6 py-12 sm:py-16">
+    <main className="mx-auto max-w-6xl px-6 py-12 sm:py-12">
       <Link
         href="/my-tracks"
         className="mb-8 inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-paper/50 transition-colors hover:text-gold"
