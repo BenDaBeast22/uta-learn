@@ -7,6 +7,7 @@ import { useVocabStore } from "@/hooks/useVocabStore";
 export default function MyVocabPage() {
   const { vocab, isLoaded, removeVocab } = useVocabStore();
   const [searchQuery, setSearchQuery] = useState("");
+  const [showInfo, setShowInfo] = useState(false);
 
   const filteredVocab = vocab.filter((item) => {
     const query = searchQuery.toLowerCase();
@@ -90,33 +91,75 @@ export default function MyVocabPage() {
 
   return (
     <main className="mx-auto max-w-5xl px-6 py-12 sm:py-16">
-      <header className="seam mb-12 pl-5">
+      <header className="seam mb-10 pl-5">
         <div className="flex items-center gap-2">
           <span className="rounded border border-gold/20 bg-gold/10 px-2 py-0.5 font-mono text-[10px] uppercase text-gold">
             Study Deck
           </span>
         </div>
 
-        <div className="mt-3 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-          <div>
-            <h1 className="font-display text-4xl leading-tight text-paper sm:text-5xl">My Vocabulary</h1>
-            <p className="mt-2 max-w-xl text-sm leading-relaxed text-paper/60 sm:text-base">
-              {vocab.length} {vocab.length === 1 ? "word" : "words"} collected from your saved song lyrics.
-            </p>
-          </div>
+        <h1 className="mt-3 font-display text-4xl leading-tight text-paper sm:text-5xl">My Vocabulary</h1>
 
-          {/* Action Controls */}
-          {vocab.length > 0 && (
-            <button
-              type="button"
-              onClick={handleExportAnki}
-              className="inline-flex items-center justify-center rounded-lg border border-gold/30 bg-gold/10 px-4 py-2.5 font-mono text-xs font-semibold text-gold transition hover:border-gold hover:bg-gold hover:text-ink"
-            >
-              Export to Anki (.csv)
-            </button>
-          )}
+        <p className="mt-4 max-w-xl font-body text-sm leading-relaxed text-paper/60 sm:text-base">
+          Review saved terms, readings, and meanings collected from your track studies.
+        </p>
+
+        {/* Toggle Button under description */}
+        <div className="mt-4">
+          <button
+            type="button"
+            onClick={() => setShowInfo(!showInfo)}
+            className="inline-flex items-center gap-1.5 font-mono text-xs text-paper/70 transition hover:text-gold"
+          >
+            <span>{showInfo ? "Hide Info" : "ℹ️ How to add Vocab & Anki Guide"}</span>
+          </button>
         </div>
       </header>
+
+      {/* Collapsible Info Drawer */}
+      {showInfo && (
+        <div className="mb-6 rounded-lg border border-paper/10 bg-paper/5 p-4 text-xs text-paper sm:text-sm flex flex-col gap-4">
+          {/* Instructions / Tip Banner */}
+          <div>
+            <div className="font-semibold text-gold">💡 How to collect words</div>
+            <div className="mt-1 leading-relaxed text-paper/90">
+              Hover over any word inside a track&apos;s lyrics and click the{" "}
+              <strong className="text-paper font-semibold">Add to Vocab</strong> button.
+            </div>
+          </div>
+
+          {/* Anki Export Explanation Banner */}
+          <div>
+            <div className="flex items-center gap-2 font-semibold text-gold">
+              <span>📦 Anki Flashcard Export</span>
+            </div>
+            <p className="mt-1 leading-relaxed text-paper/80">
+              Exporting generates a pre-formatted{" "}
+              <code className="rounded bg-paper/10 px-1 py-0.5 font-mono text-xs text-paper">.csv</code> file with HTML
+              structure enabled. Import this directly into Anki to study front-side Japanese terms with formatted
+              readings, meanings, context sentences, and song origins on the back.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Word Count Stats & Export Button Row */}
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-paper/10 pb-5">
+        <p className="font-body text-sm leading-relaxed text-paper/60 sm:text-base">
+          <span className="font-semibold text-paper">{vocab.length}</span> {vocab.length === 1 ? "word" : "words"}{" "}
+          collected from your saved song lyrics.
+        </p>
+
+        {vocab.length > 0 && (
+          <button
+            type="button"
+            onClick={handleExportAnki}
+            className="inline-flex shrink-0 items-center justify-center rounded-lg border border-gold/30 bg-gold/10 px-4 py-2 font-mono text-xs font-semibold text-gold transition hover:border-gold hover:bg-gold hover:text-ink"
+          >
+            Export to Anki (.csv)
+          </button>
+        )}
+      </div>
 
       {/* Filter / Search Bar */}
       {vocab.length > 0 && (

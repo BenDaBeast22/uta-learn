@@ -183,7 +183,7 @@ export default function MyTracksPage() {
         <div className="mt-3 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
             <h1 className="font-display text-4xl leading-tight text-paper sm:text-5xl">My Tracks</h1>
-            <p className="mt-2 max-w-xl font-body text-sm leading-relaxed text-paper/60 sm:text-base">
+            <p className="mt-4 max-w-xl font-body text-sm leading-relaxed text-paper/60 sm:text-base">
               Add custom Japanese tracks by title, artist, and YouTube link to parse synced lyrics, romaji, and word
               definitions.
             </p>

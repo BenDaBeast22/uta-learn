@@ -240,7 +240,7 @@ export default function WordToken({
                     saved ? "bg-seal/10 text-seal hover:bg-seal/20" : "bg-ink text-paper hover:bg-gold hover:text-ink"
                   }`}
                 >
-                  {saved ? `✓ Saved "${headword}"` : `+ Add "${headword}"`}
+                  {saved ? `✓ Saved "${headword}" to vocab` : `Add "${headword}" to Vocab`}
                 </button>
               </div>
 
