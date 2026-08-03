@@ -33,9 +33,9 @@ export default async function TracksPage() {
         {!user && (
           <div className="mt-6 flex flex-wrap items-center gap-2 rounded-lg border border-paper/10 bg-paper/5 px-4 py-3 text-xs text-paper/70 sm:text-sm">
             <span className="font-semibold text-gold">Want more?</span>
-            <span>Sign in to save custom tracks, collect vocabulary, and track your progress.</span>
+            <span>Create a free account to save custom tracks, collect vocabulary, and track your progress.</span>
             <Link
-              href="/login"
+              href="/login?mode=signup"
               className="ml-auto font-mono text-xs underline decoration-gold/50 underline-offset-4 transition hover:text-gold hover:decoration-gold"
             >
               Create account →

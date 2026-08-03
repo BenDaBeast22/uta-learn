@@ -1,14 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
+  const searchParams = useSearchParams();
+  const mode = searchParams.get("mode");
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isSignUp, setIsSignUp] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(mode === "signup");
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -73,7 +76,7 @@ export default function LoginPage() {
       {/* Top Header */}
       <div className="mb-8 text-center">
         <Link href="/" className="font-mono text-xs uppercase tracking-[0.3em] text-gold hover:underline">
-          ← 歌 — Uta Learn
+          ← 歌学 — Uta Learn
         </Link>
         <h1 className="mt-4 font-display text-3xl text-paper">{isSignUp ? "Create your account" : "Welcome back"}</h1>
         <p className="mt-2 text-xs text-paper/60">
