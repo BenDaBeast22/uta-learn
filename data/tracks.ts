@@ -77,7 +77,7 @@ export const tracks: Track[] = [
     accent: accentColors.beginner,
     summary: "Jibun Wooooo!!!",
     lyrics: colorsLyrics,
-    lyricsOffset: 1,
+    lyricsOffset: 0.5,
   },
   {
     id: "mirage",
@@ -116,6 +116,7 @@ export const tracks: Track[] = [
     summary: "Chainsaw go brrrrrrrrrrr",
     lyrics: irisOutLyrics,
     customThumbnail: "/iris-out.jpg",
+    lyricsOffset: -0.4,
   },
   {
     id: "pipo-pipo",
