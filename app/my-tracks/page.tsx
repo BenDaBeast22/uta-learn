@@ -91,7 +91,7 @@ export default function MyTracksPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
-    if (!title.trim() || !artist.trim()) return;
+    if (!title.trim() || !artist.trim() || !youtubeUrl.trim()) return;
 
     setLoading(true);
     setError(null);
@@ -131,7 +131,7 @@ export default function MyTracksPage() {
           user_id: user.id,
           title: title.trim(),
           artist: artist.trim(),
-          youtube_url: youtubeUrl.trim() || null,
+          youtube_url: youtubeUrl.trim(),
           track_data: { ...rawTrack, isCustom: true },
         })
         .select("id")
@@ -271,10 +271,11 @@ export default function MyTracksPage() {
 
           <div>
             <label className="block font-mono text-[11px] uppercase tracking-wider text-paper/60 mb-1.5">
-              YouTube URL <span className="text-paper/40">(Optional)</span>
+              YouTube URL <span className="text-gold">*</span>
             </label>
             <input
               type="url"
+              required
               placeholder="e.g. https://www.youtube.com/watch?v=..."
               value={youtubeUrl}
               onChange={(e) => setYoutubeUrl(e.target.value)}
@@ -306,7 +307,7 @@ export default function MyTracksPage() {
           <div className="pt-2 flex justify-end">
             <button
               type="submit"
-              disabled={loading || !user || !title.trim() || !artist.trim()}
+              disabled={loading || !user || !title.trim() || !artist.trim() || !youtubeUrl.trim()}
               className="inline-flex items-center justify-center rounded-lg border border-gold/30 bg-gold/10 px-5 py-2.5 font-mono text-xs font-semibold text-gold transition hover:border-gold hover:bg-gold hover:text-ink disabled:opacity-40 disabled:hover:border-gold/30 disabled:hover:bg-gold/10 disabled:hover:text-gold"
             >
               {loading ? "Processing..." : "Add Track"}
@@ -331,7 +332,7 @@ export default function MyTracksPage() {
             <p className="font-display text-xl text-paper">No custom tracks imported yet</p>
             <p className="mt-2 font-body text-sm text-paper/60">
               {user
-                ? "Enter a song title and artist above to fetch synced lyrics and definitions."
+                ? "Enter a song title, artist, and YouTube URL above to fetch synced lyrics and definitions."
                 : "Sign in to add custom tracks to your account."}
             </p>
           </div>

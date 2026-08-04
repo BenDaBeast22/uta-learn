@@ -91,7 +91,7 @@ export default function MyVocabPage() {
 
   return (
     <main className="mx-auto max-w-5xl px-6 py-12 sm:py-16">
-      <header className="seam mb-10 pl-5">
+      <header className="seam mb-5 pl-5">
         <div className="flex items-center gap-2">
           <span className="rounded border border-gold/20 bg-gold/10 px-2 py-0.5 font-mono text-[10px] uppercase text-gold">
             Study Deck
@@ -100,10 +100,10 @@ export default function MyVocabPage() {
 
         <h1 className="mt-3 font-display text-4xl leading-tight text-paper sm:text-5xl">My Vocabulary</h1>
 
-        <p className="mt-4 max-w-xl font-body text-sm leading-relaxed text-paper/60 sm:text-base">
-          Review saved terms, readings, and meanings collected from your track studies.
+        <p className="mt-4 max-w-xl font-body text-sm leading-relaxed sm:text-base  text-paper/60">
+          Review saved terms, readings, and meanings collected from tracks. You can also export your vocabulary directly
+          to Anki for spaced-repetition flashcard study.
         </p>
-
         {/* Toggle Button under description */}
         <div className="mt-4">
           <button
@@ -144,7 +144,7 @@ export default function MyVocabPage() {
       )}
 
       {/* Word Count Stats & Export Button Row */}
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-paper/10 pb-5">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-paper/10 pb-5 mt-5">
         <p className="font-body text-sm leading-relaxed text-paper/60 sm:text-base">
           <span className="font-semibold text-paper">{vocab.length}</span> {vocab.length === 1 ? "word" : "words"}{" "}
           collected from your saved song lyrics.

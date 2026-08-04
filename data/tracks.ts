@@ -146,7 +146,7 @@ export const tracks: Track[] = [
     duration: "4:14",
     youtubeId: "uKxyLmbOc0Q",
     accent: "#B23A32",
-    summary: "Night time smoke by the supa maket baby~",
+    summary: "Seee noo ~ demo sonnan ja dame ~ mou sonnan ja hora ~ kokoro ha shinka suru yo motto motto ~ ♫ ♫ ♫",
     lyrics: renaiCirculationLyrics,
   },
 ];
