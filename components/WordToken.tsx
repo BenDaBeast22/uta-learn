@@ -165,7 +165,7 @@ export default function WordToken({
       return (
         <ruby className="inline-flex flex-col-reverse items-center align-bottom">
           <span>{token.surface}</span>
-          <rt className="font-mono text-[0.65rem] tracking-normal opacity-80 group-hover:text-ink group-focus:text-ink">
+          <rt className="font-mono text-[0.65rem] tracking-normal opacity-80 transition-colors group-hover:text-gold group-focus:text-gold">
             {token.romaji}
           </rt>
         </ruby>
@@ -175,19 +175,21 @@ export default function WordToken({
     return token.surface;
   };
 
-  const isHighlighted = isHovered || active;
+  // Keep token highlighted in gold whenever hovered, active, OR when popover is open
+  const isHighlighted = isHovered || active || open;
 
   return (
     <span
       ref={triggerRef}
-      className="group relative mx-0.5 inline-block cursor-help"
+      className="group relative mx-0.5 inline-block cursor-pointer"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onFocus={handleMouseEnter}
       onBlur={handleMouseLeave}
+      onClick={handleMouseEnter}
       tabIndex={0}
     >
-      <span className={`rounded-sm px-0.5 transition-colors duration-150 ${isHighlighted ? "bg-gold text-ink" : ""}`}>
+      <span className={`rounded-sm px-0.5 transition-colors duration-150 ${isHighlighted ? "bg-gold" : ""}`}>
         {renderInlineContent()}
       </span>
 

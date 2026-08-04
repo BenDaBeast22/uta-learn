@@ -52,6 +52,7 @@ export const tracks: Track[] = [
     accent: accentColors.beginner,
     summary: "Lets create our own new world!",
     lyrics: newGenesisLyrics,
+    lyricsOffset: 0.6,
   },
   {
     id: "idol",
@@ -64,6 +65,7 @@ export const tracks: Track[] = [
     accent: accentColors.beginner,
     summary: "To be or not to be an Idol...",
     lyrics: idolLyrics,
+    lyricsOffset: -0.2,
   },
   {
     id: "colors",
@@ -75,6 +77,7 @@ export const tracks: Track[] = [
     accent: accentColors.beginner,
     summary: "Jibun Wooooo!!!",
     lyrics: colorsLyrics,
+    lyricsOffset: 1,
   },
   {
     id: "mirage",
@@ -137,6 +140,7 @@ export const tracks: Track[] = [
     accent: accentColors.advanced,
     summary: "Groovayyyyyy!",
     lyrics: groovinMagicLyrics,
+    lyricsOffset: -0.7,
   },
   {
     id: "renai-circulation",
