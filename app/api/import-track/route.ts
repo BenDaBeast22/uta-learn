@@ -220,6 +220,75 @@ async function fetchWithTimeout(url: string, options: RequestInit = {}, timeoutM
   }
 }
 
+/** Helper to fetch Jisho with exponential backoff retries on rate-limits (429) or failures */
+async function fetchJishoWithRetry(url: string, retries = 3, delayMs = 300): Promise<any | null> {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const res = await fetch(url, {
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)",
+        },
+      });
+
+      if (res.ok) {
+        return await res.json();
+      }
+
+      // Retry on rate-limits (429) or server errors (5xx)
+      if (res.status === 429 || res.status >= 500) {
+        await new Promise((r) => setTimeout(r, delayMs * attempt));
+        continue;
+      }
+
+      break;
+    } catch {
+      if (attempt === retries) break;
+      await new Promise((r) => setTimeout(r, delayMs * attempt));
+    }
+  }
+  return null;
+}
+
+/** Pre-fetches Jisho words in small concurrent batches with retries */
+async function prefetchJishoMeanings(wordPairs: Array<{ lookupWord: string; surface: string }>) {
+  const uncached = wordPairs.filter(({ lookupWord }) => !meaningCache.has(lookupWord));
+  if (uncached.length === 0) return;
+
+  const BATCH_SIZE = 2; // Small batch size to respect Jisho limits
+  for (let i = 0; i < uncached.length; i += BATCH_SIZE) {
+    const batch = uncached.slice(i, i + BATCH_SIZE);
+
+    await Promise.all(
+      batch.map(async ({ lookupWord, surface }) => {
+        let meaning = "";
+
+        // 1. Primary lookup using lemma/basic form
+        const url1 = `https://jisho.org/api/v1/search/words?keyword=${encodeURIComponent(lookupWord)}`;
+        const data1 = await fetchJishoWithRetry(url1);
+        const senses1 = data1?.data?.[0]?.senses;
+        if (senses1 && senses1.length > 0) {
+          meaning = senses1[0].english_definitions?.join("; ") ?? "";
+        }
+
+        // 2. Fallback lookup using surface form if basic_form returned no matches
+        if (!meaning && surface && surface !== lookupWord) {
+          const url2 = `https://jisho.org/api/v1/search/words?keyword=${encodeURIComponent(surface)}`;
+          const data2 = await fetchJishoWithRetry(url2);
+          const senses2 = data2?.data?.[0]?.senses;
+          if (senses2 && senses2.length > 0) {
+            meaning = senses2[0].english_definitions?.join("; ") ?? "";
+          }
+        }
+
+        meaningCache.set(lookupWord, meaning || "(no dictionary match — fill in manually)");
+      }),
+    );
+
+    // Stagger batch intervals slightly to prevent rapid 429 triggers
+    await new Promise((r) => setTimeout(r, 250));
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -424,7 +493,7 @@ export async function POST(req: NextRequest) {
       return mergeVerbConjugations(mapped);
     });
 
-    // 6. Bulk pre-fetch all unique words from Jisho
+    // 6. Bulk pre-fetch all unique words from Jisho with retries & rate-limit throttling
     const uniqueWordMap = new Map<string, { lookupWord: string; surface: string }>();
     tokenizedLines.flat().forEach((t) => {
       if (!t.skip && t.lookupWord && !uniqueWordMap.has(t.lookupWord)) {
@@ -493,60 +562,6 @@ export async function POST(req: NextRequest) {
   } catch (err: any) {
     console.error("Error in /api/import-track:", err);
     return NextResponse.json({ error: err.message || "An unexpected error occurred during import." }, { status: 500 });
-  }
-}
-
-/** Pre-fetches Jisho words in small concurrent batches */
-async function prefetchJishoMeanings(wordPairs: Array<{ lookupWord: string; surface: string }>) {
-  const uncached = wordPairs.filter(({ lookupWord }) => !meaningCache.has(lookupWord));
-  if (uncached.length === 0) return;
-
-  const BATCH_SIZE = 3;
-  for (let i = 0; i < uncached.length; i += BATCH_SIZE) {
-    const batch = uncached.slice(i, i + BATCH_SIZE);
-
-    await Promise.all(
-      batch.map(async ({ lookupWord, surface }) => {
-        let meaning = "";
-        try {
-          let res = await fetch(`https://jisho.org/api/v1/search/words?keyword=${encodeURIComponent(lookupWord)}`, {
-            headers: {
-              "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)",
-            },
-          });
-
-          if (res.ok) {
-            const data = await res.json();
-            const senses = data?.data?.[0]?.senses;
-            if (senses && senses.length > 0) {
-              meaning = senses[0].english_definitions?.join("; ") ?? "";
-            }
-          }
-
-          if (!meaning && surface && surface !== lookupWord) {
-            res = await fetch(`https://jisho.org/api/v1/search/words?keyword=${encodeURIComponent(surface)}`, {
-              headers: {
-                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)",
-              },
-            });
-
-            if (res.ok) {
-              const data = await res.json();
-              const senses = data?.data?.[0]?.senses;
-              if (senses && senses.length > 0) {
-                meaning = senses[0].english_definitions?.join("; ") ?? "";
-              }
-            }
-          }
-        } catch {
-          // Graceful fallback
-        }
-
-        meaningCache.set(lookupWord, meaning || "(no dictionary match — fill in manually)");
-      }),
-    );
-
-    await new Promise((r) => setTimeout(r, 150));
   }
 }
 
