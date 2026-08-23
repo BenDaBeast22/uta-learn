@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://sitemaps.org">
+  
+  <!-- Main Homepage -->
+  <url>
+    <loc>https://uta-learn.vercel.app/</loc>
+    <lastmod>2026-08-23</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Curated Track 1: New Genesis -->
+  <url>
+    <loc>https://uta-learn.vercel.app/track/new-genesis</loc>
+    <lastmod>2026-08-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Curated Track 2: Idol -->
+  <url>
+    <loc>https://uta-learn.vercel.app/track/idol</loc>
+    <lastmod>2026-08-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Curated Track 3: Colors -->
+  <url>
+    <loc>https://vercel.app/colors</loc>
+    <lastmod>2026-08-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Curated Track 4: Mirage -->
+  <url>
+    <loc>https://vercel.app/mirage</loc>
+    <lastmod>2026-08-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Curated Track 5: Night Dancer -->
+  <url>
+    <loc>https://vercel.app/night-dancer</loc>
+    <lastmod>2026-08-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Curated Track 6: Iris Out -->
+  <url>
+    <loc>https://vercel.app/iris-out</loc>
+    <lastmod>2026-08-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Curated Track 7: Pipo Pipo -->
+  <url>
+    <loc>https://vercel.app/pipo-pipo</loc>
+    <lastmod>2026-08-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Curated Track 8: Groovin Magic -->
+  <url>
+    <loc>https://vercel.app/groovin-magic</loc>
+    <lastmod>2026-08-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Curated Track 9: Renai Circulation -->
+  <url>
+    <loc>https://vercel.app/renai-circulation</loc>
+    <lastmod>2026-08-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+</urlset>

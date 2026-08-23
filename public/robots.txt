@@ -1,0 +1,13 @@
+# 1. Allow all search engines to crawl your public website
+User-agent: *
+Allow: /
+
+# 2. Block search engines from indexing private user pages
+Disallow: /my-tracks
+Disallow: /my-vocab
+Disallow: /settings
+Disallow: /api/
+Dissallow: /auth/
+
+# 3. Tell search engines exactly where to find your map of pages
+Sitemap: https://uta-learn.vercel.app/
