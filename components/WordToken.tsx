@@ -35,6 +35,7 @@ export default function WordToken({
   const [isVisible, setIsVisible] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [coords, setCoords] = useState<{ left: number; top: number; flip: boolean } | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
   // Auth states
   const [user, setUser] = useState<any>(null);
@@ -56,6 +57,11 @@ export default function WordToken({
     if (!isLoaded || !headword) return false;
     return vocab.some((v) => v.token.surface === headword || v.token.baseForm === headword);
   }, [vocab, isLoaded, headword]);
+
+  // Set mounted flag to handle hydration safety for createPortal
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Check auth state on mount
   useEffect(() => {
@@ -156,6 +162,8 @@ export default function WordToken({
     }
   };
 
+  const jishoUrl = `https://jisho.org/search/${encodeURIComponent(headword)}`;
+
   const renderInlineContent = () => {
     if (displayMode === "romaji") {
       return <span className="font-mono text-sm sm:text-base">{token.romaji}</span>;
@@ -195,6 +203,7 @@ export default function WordToken({
 
       {open &&
         coords &&
+        isMounted &&
         createPortal(
           <span
             role="tooltip"
@@ -260,7 +269,7 @@ export default function WordToken({
               )}
 
               {/* Action Area */}
-              <div className="mt-2.5 border-t border-ink/10 pt-2">
+              <div className="mt-2.5 space-y-1.5 border-t border-ink/10 pt-2">
                 {showAuthWarning ? (
                   <div className="rounded border border-red-900/30 bg-red-500/10 p-2 space-y-1.5">
                     <p className="font-body text-[0.68rem] font-medium leading-tight text-red-900">
@@ -284,6 +293,41 @@ export default function WordToken({
                     {saved ? `✓ Saved "${headword}" to vocab` : `Add "${headword}" to Vocab`}
                   </button>
                 )}
+
+                <a
+                  href={jishoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="flex w-full items-center justify-center gap-1.5 rounded-md border border-ink/15 px-2 py-1 font-mono text-[0.7rem] font-medium text-ink/70 transition hover:border-seal/40 hover:text-seal"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="h-3 w-3"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <circle cx="11" cy="11" r="7" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                  </svg>
+                  Jisho
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="h-2.5 w-2.5 opacity-60"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M7 17L17 7M7 7h10v10" />
+                  </svg>
+                </a>
               </div>
 
               {/* Tail pointing toward word */}
