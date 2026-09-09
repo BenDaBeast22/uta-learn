@@ -1,0 +1,17 @@
+name: Keep Supabase Alive
+
+on:
+  schedule:
+    # Runs at 00:00 UTC every Monday and Thursday (Twice a week prevents the 7-day pause)
+    - cron: "0 0 * * 1,4"
+  workflow_dispatch: # This allows you to manually press a button to test it anytime
+
+jobs:
+  ping_supabase:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase Database Table
+        run: |
+          curl -X GET "${{ secrets.SUPABASE_URL }}/rest/v1/user_vocab?limit=1" \
+          -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+          -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}"
